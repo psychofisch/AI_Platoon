@@ -158,6 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileIO.h" />
+    <ClInclude Include="gameobj.h" />
     <ClInclude Include="normalize.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>

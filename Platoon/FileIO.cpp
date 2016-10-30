@@ -1,11 +1,11 @@
 #include "FileIO.h"
 
-FileWriter::FileWriter()
+FileIO::FileIO()
 {
 }
 
 
-FileWriter::~FileWriter()
+FileIO::~FileIO()
 {
 }
 /*
@@ -112,39 +112,57 @@ void FileWriter::LoadLightShapesFromFile(std::string path, std::vector<std::shar
 	file.close();
 }*/
 
-void FileWriter::LoadSpawnPoints(const char* path, std::vector<sf::Vector2f>& spawns)
+bool FileIO::LoadObstacles(const char* path, std::vector<gameobj>& obstacles, std::vector<sf::Texture>& textures)
 {
-	std::vector<sf::Vector2f> sp;
-
 	std::ifstream file;
 	file.open(path);
 	if (!file.is_open())
 	{
 		std::cout << "Failed to open file: " << path << std::endl;
-		return;
+		return false;
 	}
 
-	std::string tmp;
-	sf::Vector2f vec;
+	size_t textureSize = textures.size();
 
 	do {
+		std::string tmp;
 		std::getline(file, tmp);
 
-		size_t p = tmp.find(':');
+		if (tmp.size() == 0)
+			break;
 
-		vec.x = atof(tmp.substr(0, p).c_str());
-		vec.y = atof(tmp.substr(p+1).c_str());
+		if (tmp[0] == 't')
+		{
+			char tex_path[255];
+			sf::Texture tmp_tex;
+			sscanf_s(tmp.c_str(), "t,%s", tex_path);
+			tmp_tex.loadFromFile(tex_path);
+			textures.push_back(tmp_tex);
 
-		sp.push_back(vec);
+			std::cout << "image path " << textures.size()-textureSize << " = " << tex_path << std::endl;
+		}
+		else
+		{
+			gameobj tmp_obj;
+			sf::Vector2f pos;
+			float rot;
+			sscanf_s(tmp.c_str(), "%i,%f,%f,%f", &tmp_obj.textureId, &pos.x, &pos.y, &rot);
+			tmp_obj.setPosition(pos);
+			tmp_obj.setRotation(rot);
+			tmp_obj.sprite.setTexture(textures[textureSize+tmp_obj.textureId]);
+			obstacles.push_back(tmp_obj);
+
+			std::cout << "index = " << tmp_obj.textureId << ", position = " << pos.x << ":" << pos.y << std::endl;
+		}
 		
 	} while (!file.eof());
 
-	spawns = sp;
-
 	file.close();
+
+	return true;
 }
 
-std::string FileWriter::LoadText(const char* path)
+std::string FileIO::LoadText(const char* path)
 {
 	std::ifstream file(path);
 	//file.open(path);

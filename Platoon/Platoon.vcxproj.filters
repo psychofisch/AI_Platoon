@@ -41,5 +41,8 @@
     <ClInclude Include="normalize.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gameobj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,16 +8,18 @@
 
 #include <SFML\System\Vector2.hpp> 
 
-class FileWriter
+#include "gameobj.h"
+
+class FileIO
 {
 public:
-	FileWriter();
-	~FileWriter();
+	FileIO();
+	~FileIO();
 	
 	/*void SaveLightShapes(std::string, std::vector<std::shared_ptr<ltbl::LightShape>>&);
 	void LoadLightShapesFromFile(std::string, std::vector<std::shared_ptr<ltbl::LightShape>>&, ltbl::LightSystem&);*/
 	
-	void LoadSpawnPoints(const char* path, std::vector<sf::Vector2f>& spawns);
+	static bool LoadObstacles(const char* path, std::vector<gameobj>& obstacles, std::vector<sf::Texture>& textures);
 
 	std::string LoadText(const char*);
 };

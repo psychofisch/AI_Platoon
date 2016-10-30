@@ -18,12 +18,13 @@ int main()
 	settings.antialiasingLevel = 2;
 
 	std::cout << "creating window...\n";
-	sf::RenderWindow window(vm, "Platoon", sf::Style::Titlebar | sf::Style::Close, settings);
+	sf::RenderWindow window(vm, "Platoon", sf::Style::Titlebar | sf::Style::Close | sf::Style::Default, settings);
 	window.setVerticalSyncEnabled(false);
 	window.setFramerateLimit(60);
 
 	world platoon(sf::Vector2f(2048, 2048), &window);
 	platoon.setWorldTexture("checkers_128.png");
+	platoon.loadObstacles("obstacles.x");
 	//*** init
 
 	platoon.run();
