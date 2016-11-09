@@ -19,8 +19,8 @@ public:
 	/*void SaveLightShapes(std::string, std::vector<std::shared_ptr<ltbl::LightShape>>&);
 	void LoadLightShapesFromFile(std::string, std::vector<std::shared_ptr<ltbl::LightShape>>&, ltbl::LightSystem&);*/
 	
-	static bool LoadObstacles(const char* path, std::vector<gameobj>& obstacles, std::vector<sf::Texture>& textures);
+	static sf::Vector2f LoadLevel(const char* path, std::vector<gameobj>& obstacles, std::vector<sf::Texture*>& textures);
 
-	std::string LoadText(const char*);
+	static std::string LoadText(const char*);
 };
 

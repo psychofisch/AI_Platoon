@@ -1,3 +1,5 @@
+s,2048.0,4096.0
+w,checkers_128.png
 t,small.png
 t,medium.png
 t,big.png

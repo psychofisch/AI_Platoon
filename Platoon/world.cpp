@@ -2,9 +2,9 @@
 
 
 
-world::world(sf::Vector2f size, sf::RenderWindow* wndw)
+world::world(sf::RenderWindow* wndw)
 	:m_window(wndw),
-	m_size(size)
+	m_size(0, 0)
 {
 	m_font.loadFromFile("NotoSans-Regular.ttf");
 	m_debugText.setFont(m_font);
@@ -30,9 +30,21 @@ void world::run()
 	sf::Vector2f windowCenter(m_window->getSize());
 	windowCenter /= 2.0f;
 	
+	sf::Clock time;
+	float dt = 0.0f;
+
+	Agent tester(Agent::STEER_ARRIVE);
+	tester.setSprite(m_textures, "player_blue.png");
+
+	//m_scene.push_back(&tester);
+
+	tester.setPosition(sf::Vector2f(50.0f, 50.0f));
+
 	bool quit = false;
 	while (!quit)
 	{
+		time.restart();
+
 		sf::Vector2i mousePos = sf::Mouse::getPosition(*m_window);
 		sf::Vector2f mousePos_mapped = m_window->mapPixelToCoords(mousePos, m_camera);
 		
@@ -55,13 +67,11 @@ void world::run()
 				//std::cout << "wheel delta > " << eve.mouseWheelScroll.delta << std::endl;
 				if (eve.mouseWheelScroll.delta < 0)
 				{
-					//zoomFactor += 0.1f;
-					m_camera.zoom(1.05f);
+					m_camera.zoom(1.1f);
 				}
 				else if (eve.mouseWheelScroll.delta > 0)
 				{
-					//zoomFactor -= 0.1f;
-					m_camera.zoom(0.95f);
+					m_camera.zoom(0.9f);
 				}
 				break;
 			}
@@ -87,7 +97,7 @@ void world::run()
 
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Middle) && !mouseMoveRect.contains(mousePos))
 		{
-			m_camera.move(normalize(sf::Vector2f(mousePos) - windowCenter)*5.0f);
+			m_camera.move(normalize(sf::Vector2f(mousePos) - windowCenter)*10.0f);
 		}
 		//*** controls
 
@@ -105,7 +115,7 @@ void world::run()
 
 		m_window->draw(m_worldSprite);
 
-		for (auto obstacle : m_obstacles)
+		for (auto obstacle : m_gameobjects)
 		{
 			m_window->draw(obstacle.sprite);
 		}
@@ -115,15 +125,17 @@ void world::run()
 
 		m_window->display();
 		//*** render
+
+		dt = time.getElapsedTime().asSeconds();
 	}
 }
 
-void world::setWorldTexture(const char * path)
+int world::addTexture(const char * path)
 {
-	m_worldTexture.loadFromFile(path);
-	m_worldTexture.setRepeated(true);
-	m_worldSprite.setTexture(m_worldTexture);
-	m_worldSprite.setTextureRect(sf::IntRect(0, 0, m_size.x, m_size.y));
+	sf::Texture* tmp = new sf::Texture();
+	tmp->loadFromFile(path);
+	m_textures.push_back(tmp);
+	return m_textures.size() - 1;
 }
 
 int world::addObstacle(sf::Texture * texture, sf::Vector2f position)
@@ -131,7 +143,27 @@ int world::addObstacle(sf::Texture * texture, sf::Vector2f position)
 	return 0;
 }
 
-bool world::loadObstacles(const char * path)
+bool world::loadLevel(const char * path)
 {
-	return FileIO::LoadObstacles(path, m_obstacles, m_textures);
+	if (m_textures.size() > 0)
+	{
+		for (auto t : m_textures)
+		{
+			delete t;
+		}
+	}
+
+	m_size = FileIO::LoadLevel(path, m_gameobjects, m_textures);
+	if(m_size.x <= 0.0f || m_size.y <= 0.0f)
+		return false;
+	
+	m_worldSprite.setTexture(*m_textures[0]);
+	m_worldSprite.setTextureRect(sf::IntRect(0, 0, m_size.x, m_size.y));
+
+	for (gameobj g : m_gameobjects)
+	{
+		m_scene.push_back(&g);
+	}
+
+	return true;
 }

@@ -7,6 +7,7 @@
 #include "normalize.h"
 #include "gameobj.h"
 #include "FileIO.h"
+#include "Agent.h"
 
 /*Colors
 41,255,249
@@ -19,21 +20,21 @@
 class world
 {
 public:
-	world(sf::Vector2f size, sf::RenderWindow* wndw);
+	world(sf::RenderWindow* wndw);
 	~world();
 	void run();
-	void setWorldTexture(const char* path);
+	int addTexture(const char* path);
 	int addObstacle(sf::Texture* texture, sf::Vector2f position);
-	bool loadObstacles(const char* path);
+	bool loadLevel(const char* path);
 private:
 	sf::RenderWindow* m_window;
-	sf::Texture m_worldTexture;
 	sf::Sprite m_worldSprite;
 	sf::View m_camera;
 	sf::Vector2f m_size;
 	sf::Text m_debugText;
 	sf::Font m_font;
-	std::vector<gameobj> m_obstacles;
-	std::vector<sf::Texture> m_textures;
+	std::vector<gameobj*> m_scene;
+	std::vector<gameobj> m_gameobjects;
+	std::vector<sf::Texture*> m_textures;
 };
 

@@ -22,9 +22,8 @@ int main()
 	window.setVerticalSyncEnabled(false);
 	window.setFramerateLimit(60);
 
-	world platoon(sf::Vector2f(2048, 2048), &window);
-	platoon.setWorldTexture("checkers_128.png");
-	platoon.loadObstacles("obstacles.x");
+	world platoon(&window);
+	platoon.loadLevel("level1.x");
 	//*** init
 
 	platoon.run();

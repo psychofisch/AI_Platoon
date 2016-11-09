@@ -151,15 +151,20 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Agent.cpp" />
     <ClCompile Include="FileIO.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="normalize.cpp" />
+    <ClCompile Include="Steering.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Agent.h" />
     <ClInclude Include="FileIO.h" />
     <ClInclude Include="gameobj.h" />
+    <ClInclude Include="Kinematics.h" />
     <ClInclude Include="normalize.h" />
+    <ClInclude Include="Steering.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
