@@ -3,17 +3,18 @@
 #include <SFML\System\Vector2.hpp>
 
 struct Kinematics {
+	bool enabled;
 	sf::Vector2f velocity;
 	float rotation;
 
-	Kinematics(sf::Vector2f v, float r)
+	Kinematics(sf::Vector2f v, float r, bool e)
 		:velocity(v),
-		rotation(r)
+		rotation(r),
+		enabled(e)
 	{
 	}
 
-	Kinematics()
+	Kinematics() : Kinematics(sf::Vector2f(0, 0), 0, false)
 	{
-		Kinematics(sf::Vector2f(0, 0), 0);
 	}
 };

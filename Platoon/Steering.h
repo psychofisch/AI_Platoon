@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Kinematics.h"
+#include "vector2math.h"
+
+#include <iostream>
 
 class Agent;
 
@@ -10,7 +13,7 @@ public:
 	Steering();
 	~Steering();
 
-	virtual Kinematics getKinematics(Agent& agent, sf::Vector2f targetPos) = 0;
+	virtual Kinematics getKinematics(Agent& agent) = 0;
 };
 
 class Arrive : public Steering {
@@ -18,5 +21,5 @@ public:
 	Arrive();
 	~Arrive();
 
-	Kinematics getKinematics(Agent& agent, sf::Vector2f targetPos);
+	Kinematics getKinematics(Agent& agent);
 };

@@ -4,7 +4,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "normalize.h"
+#include "vector2math.h"
 #include "gameobj.h"
 #include "FileIO.h"
 #include "Agent.h"

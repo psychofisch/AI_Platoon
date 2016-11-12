@@ -35,6 +35,7 @@ void world::run()
 
 	Agent tester(Agent::STEER_ARRIVE);
 	tester.setSprite(m_textures, "player_blue.png");
+	tester.setMaxSpeed(100.0f);
 
 	//m_scene.push_back(&tester);
 
@@ -59,6 +60,7 @@ void world::run()
 			}
 			else if (eve.type == sf::Event::MouseButtonPressed && eve.mouseButton.button == sf::Mouse::Left)
 			{
+				tester.moveTo(mousePos_mapped);
 				std::cout << mousePos_mapped.x << "," << mousePos_mapped.y << std::endl;
 				break;
 			}
@@ -80,6 +82,7 @@ void world::run()
 				switch (eve.key.code)
 				{
 				case sf::Keyboard::H:
+					std::cout << tester.getRotation() << std::endl;
 					break;
 				case sf::Keyboard::R:
 					break;
@@ -119,6 +122,10 @@ void world::run()
 		{
 			m_window->draw(obstacle.sprite);
 		}
+
+		tester.update(dt);
+		tester.drawSteps(m_window);
+		m_window->draw(tester.sprite);
 
 		m_window->setView(m_window->getDefaultView());
 		m_window->draw(m_debugText);
