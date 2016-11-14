@@ -14,3 +14,8 @@ float magnitude(const sf::Vector2f& source)
 {
 	return sqrt((source.x * source.x) + (source.y * source.y));
 }
+
+sf::Vector2f multiply(const sf::Vector2f & left, const sf::Vector2f & right)
+{
+	return sf::Vector2f(left.x*right.x, left.y*right.y);
+}

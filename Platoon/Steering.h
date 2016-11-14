@@ -23,3 +23,11 @@ public:
 
 	Kinematics getKinematics(Agent& agent);
 };
+
+class Seek : public Steering {
+public:
+	Seek();
+	~Seek();
+
+	Kinematics getKinematics(Agent& agent);
+};

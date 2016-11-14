@@ -3,14 +3,14 @@
 #include <SFML\System\Vector2.hpp>
 
 struct Kinematics {
-	bool enabled;
-	sf::Vector2f velocity;
-	float rotation;
+	bool move;
+	sf::Vector2f linearAcc;
+	float angular;
 
 	Kinematics(sf::Vector2f v, float r, bool e)
-		:velocity(v),
-		rotation(r),
-		enabled(e)
+		:linearAcc(v),
+		angular(r),
+		move(e)
 	{
 	}
 

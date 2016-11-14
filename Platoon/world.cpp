@@ -34,12 +34,15 @@ void world::run()
 	float dt = 0.0f;
 
 	Agent tester(Agent::STEER_ARRIVE);
-	tester.setSprite(m_textures, "player_blue.png");
+	tester.setSprite(m_textures, "player.png");
+	tester.setColor(sf::Color(41, 255, 249));
 	tester.setMaxSpeed(100.0f);
+	tester.setMaxAcc(1.0f);
 
 	//m_scene.push_back(&tester);
 
 	tester.setPosition(sf::Vector2f(50.0f, 50.0f));
+	tester.moveTo(sf::Vector2f(50.0f, 50.0f));
 
 	bool quit = false;
 	while (!quit)
