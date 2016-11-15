@@ -50,8 +50,9 @@ Kinematics Arrive::getKinematics(Agent & agent)
 		result.linearAcc = (result.linearAcc / magnitude(result.linearAcc))*agent.getMaxAcc();
 
 	//rotation
-	targetDir = normalize(targetDir);
-	float targetRot = (atan2(targetDir.y, targetDir.x)*(180 / sf::PI)) - agent.getRotation();
+	float targetRot = radToDeg(angleR(targetDir)) - agent.getRotation() + 180.f;
+
+	std::cout << targetRot << std::endl;
 
 	if (targetRot > 1.0f)
 		targetRot = 1.0f;

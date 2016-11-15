@@ -19,3 +19,18 @@ sf::Vector2f multiply(const sf::Vector2f & left, const sf::Vector2f & right)
 {
 	return sf::Vector2f(left.x*right.x, left.y*right.y);
 }
+
+float angleD(const sf::Vector2f & v)
+{
+	return angleR(v)*(180 / sf::PI);
+}
+
+float angleR(const sf::Vector2f & v)
+{
+	return atan2(v.y, v.x);
+}
+
+float radToDeg(float Rad)
+{
+	return Rad / sf::PI * 180.f;
+}
