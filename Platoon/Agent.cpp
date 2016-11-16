@@ -1,16 +1,9 @@
 #include "Agent.h"
 
 
-
 Agent::Agent()
-	:Agent(STEER_NONE)
 {
-}
-
-Agent::Agent(int mode)
-{
-	if (!setSteering(mode))
-		m_steering = nullptr;
+	m_steering.push_back(new Arrive());
 
 	sf::Texture* steps_tex = new sf::Texture();
 	steps_tex->loadFromFile("steps.png");
@@ -28,7 +21,10 @@ Agent::Agent(int mode)
 
 Agent::~Agent()
 {
-	delete m_steering;
+	for (Steering* s : m_steering)
+	{
+		delete s;
+	}
 }
 
 float Agent::getMaxSpeed() const
@@ -51,12 +47,17 @@ sf::Vector2f Agent::getVelocity() const
 	return m_velocity;
 }
 
+Path& Agent::getPath()
+{
+	return m_path;
+}
+
 void Agent::moveTo(sf::Vector2f target)
 {
 	m_target = target;
 }
 
-bool Agent::setSteering(int mode)
+/*bool Agent::setSteering(int mode)
 {
 	if (mode == STEER_ARRIVE)
 	{
@@ -64,7 +65,7 @@ bool Agent::setSteering(int mode)
 		return true;
 	}
 	return false;
-}
+}*/
 
 bool Agent::setMaxSpeed(float newMaxSpeed)
 {
@@ -118,7 +119,7 @@ void Agent::drawSteps(sf::RenderWindow * wndw)
 void Agent::update(float dt)
 {
 	//movement
-	Kinematics latest = m_steering->getKinematics(*this);
+	Kinematics latest = m_steering[0]->getKinematics(*this);
 	
 	if (latest.move == true)
 	{

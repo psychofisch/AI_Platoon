@@ -34,3 +34,8 @@ float radToDeg(float Rad)
 {
 	return Rad / sf::PI * 180.f;
 }
+
+float degToRad(float d)
+{
+	return (d / 180.f) * sf::PI;
+}

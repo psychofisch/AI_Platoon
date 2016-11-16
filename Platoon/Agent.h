@@ -3,6 +3,7 @@
 #include "Kinematics.h"
 #include "Steering.h"
 #include "gameobj.h"
+#include "Path.h"
 
 class Agent : public gameobj
 {
@@ -24,9 +25,10 @@ public:
 	float getMaxAcc() const;
 	sf::Vector2f getTargetPos() const;
 	sf::Vector2f getVelocity() const;
-	
+	Path& getPath();
+
 	void moveTo(sf::Vector2f target);
-	bool setSteering(int mode);//accepts SteerMode; int for compatibility
+	//bool setSteering(int mode);//accepts SteerMode; int for compatibility
 	bool setMaxSpeed(float newMaxSpeed);//accepts Speeds > 0.0f; returns True if value is accepted
 	bool setMaxAcc(float newMaxAcc);
 	void setSprite(std::vector<sf::Texture*>& textures, const char * path);
@@ -40,10 +42,10 @@ private:
 	float m_maxAcc;
 	sf::Vector2f m_velocity;
 	sf::Vector2f m_target;
-	Steering* m_steering;
+	std::vector<Steering*> m_steering;
 	sf::Sprite m_stepsSprite;
 	steps m_steps;
 	sf::Color m_color;
-	std::vector<sf::Vector2f> m_path;
+	Path m_path;
 };
 

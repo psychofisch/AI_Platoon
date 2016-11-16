@@ -50,7 +50,7 @@ Kinematics Arrive::getKinematics(Agent & agent)
 		result.linearAcc = (result.linearAcc / magnitude(result.linearAcc))*agent.getMaxAcc();
 
 	//rotation
-	float targetRot = radToDeg(angleR(targetDir)) - agent.getRotation() + 180.f;
+	float targetRot = angleD(targetDir) - agent.getRotation();
 
 	std::cout << targetRot << std::endl;
 
@@ -78,5 +78,20 @@ Seek::~Seek()
 
 Kinematics Seek::getKinematics(Agent & agent)
 {
-	return Kinematics();
+	Kinematics result;
+	sf::Vector2f targetDir = agent.getTargetPos() - agent.getPosition();
+	float d = magnitude(targetDir);
+
+	//movement
+
+	//std::cout << estSpeed << std::endl;
+
+	result.linearAcc = (normalize(targetDir) * agent.getMaxSpeed()) - agent.getVelocity();
+
+	if (magnitude(result.linearAcc) > agent.getMaxAcc())
+		result.linearAcc = (result.linearAcc / magnitude(result.linearAcc))*agent.getMaxAcc();
+
+	//return
+	result.move = true;
+	return result;
 }

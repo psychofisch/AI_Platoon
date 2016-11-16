@@ -33,7 +33,7 @@ void world::run()
 	sf::Clock time;
 	float dt = 0.0f;
 
-	Agent tester(Agent::STEER_ARRIVE);
+	Agent tester;
 	tester.setSprite(m_textures, "player.png");
 	tester.setColor(sf::Color(41, 255, 249));
 	tester.setMaxSpeed(100.0f);
