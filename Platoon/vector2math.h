@@ -9,6 +9,7 @@ float angleD(const sf::Vector2f& v);
 float angleR(const sf::Vector2f& v);
 float radToDeg(float r);
 float degToRad(float d);
+sf::Vector2f rotateD(sf::Vector2f v, float aD);
 
 namespace sf {
 	const float PI = 3.1415f;

@@ -117,3 +117,26 @@ Kinematics Seek::getKinematics(Agent & agent)
 	result.move = true;
 	return result;
 }
+
+ObstacleAvoid::ObstacleAvoid()
+{
+}
+
+ObstacleAvoid::~ObstacleAvoid()
+{
+}
+
+Kinematics ObstacleAvoid::getKinematics(Agent & agent)
+{
+	Kinematics result;
+	std::vector<gameobj> obst = *agent.getObstacles();
+	sf::Vector2f w[3];
+	agent.getWhiskers(w);
+	for (int i = 0; i < obst.size(); ++i)
+	{
+		if (obst[i].sprite.getGlobalBounds().contains(agent.getPosition() + w[1]))
+			std::cout << "collision!\n";
+	}
+
+	return result;
+}

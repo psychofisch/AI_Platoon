@@ -14,6 +14,7 @@ public:
 
 	sf::Vector2f getWaypoint(int i) const;
 	sf::Vector2f getNextWaypoint() const;
+	int getNextWayPointIndex() const;
 	int size();
 
 	int addWaypoint(sf::Vector2f p);

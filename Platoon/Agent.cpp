@@ -7,12 +7,14 @@ Agent::Agent()
 
 	m_steering.push_back(new Arrive());
 	m_steering.push_back(new Seek());
+	m_steering.push_back(new ObstacleAvoid());
 
 	sf::Texture* steps_tex = new sf::Texture();
 	steps_tex->loadFromFile("steps.png");
 
 	m_stepsSprite.setTexture(*steps_tex);
 	m_stepsSprite.setOrigin(steps_tex->getSize().x / 2, steps_tex->getSize().y / 2);
+	m_stepsSprite.scale(0.5f, 0.5f);
 
 	m_steps.cnt = 0;
 	m_steps.maxTime = 1.0f;
@@ -48,6 +50,22 @@ sf::Vector2f Agent::getTargetPos() const
 sf::Vector2f Agent::getVelocity() const
 {
 	return m_velocity;
+}
+
+void Agent::getWhiskers(sf::Vector2f * out) const
+{
+	float angle = 20.f;
+	//center ray
+	out[1] = m_velocity * 2.0f;
+
+	//whiskers
+	out[0] = rotateD(out[1], angle) * 0.5f;
+	out[2] = rotateD(out[1], -angle) * 0.5f;
+}
+
+std::vector<gameobj>* Agent::getObstacles() const
+{
+	return m_obstacles;
 }
 
 Path& Agent::getPath()
@@ -110,7 +128,12 @@ int Agent::addWaypoint(sf::Vector2f p)
 	return m_path.addWaypoint(p);
 }
 
-void Agent::drawSteps(sf::RenderWindow * wndw)
+void Agent::setObstaclePointer(std::vector<gameobj>* obstacle_ptr)
+{
+	m_obstacles = obstacle_ptr;
+}
+
+void Agent::drawDebug(sf::RenderWindow * wndw)
 {
 	//draw steps
 	m_stepsSprite.setColor(m_color);
@@ -123,21 +146,33 @@ void Agent::drawSteps(sf::RenderWindow * wndw)
 	//draw path&target
 	if (m_behaviour == STEER_PATH)
 	{
-		m_stepsSprite.setColor(sf::Color(77, 255, 54, 255));
-		for (int i = 0; i < m_path.size(); ++i)
+		for (int i = 1; i <= m_path.size(); ++i)
 		{
-			m_stepsSprite.setPosition(m_path.getWaypoint(i));
-			wndw->draw(m_stepsSprite);
+			//lines
+			sf::Vector2f line(m_path.getWaypoint(i - 1) - m_path.getWaypoint(i));
+			sf::RectangleShape lineShape(sf::Vector2f(magnitude(line), 5));
+			lineShape.setFillColor(sf::Color::Black);
+			lineShape.rotate(angleD(line));
+			lineShape.setPosition(m_path.getWaypoint(i));
+			wndw->draw(lineShape);
 		}
-		m_stepsSprite.setPosition(m_path.getNextWaypoint());
-		m_stepsSprite.setColor(sf::Color::Red);
-		wndw->draw(m_stepsSprite);
 	}
-	else
+
+	m_stepsSprite.setPosition(m_target);
+	m_stepsSprite.setColor(sf::Color::Red);
+	wndw->draw(m_stepsSprite);
+
+	//draw whiskers
+	sf::Vector2f w[3];
+	getWhiskers(w);
+	for (int i = 0; i < 3; ++i)
 	{
-		m_stepsSprite.setPosition(m_target);
-		m_stepsSprite.setColor(sf::Color::Red);
-		wndw->draw(m_stepsSprite);
+		sf::Vector2f line(w[i]);
+		sf::RectangleShape lineShape(sf::Vector2f(magnitude(line), 5));
+		lineShape.setFillColor(sf::Color::Magenta);
+		lineShape.setRotation(angleD(line));
+		lineShape.setPosition(getPosition());
+		wndw->draw(lineShape);
 	}
 
 	//reset
@@ -148,6 +183,9 @@ void Agent::update(float dt)
 {
 	//movement
 	Kinematics latest = m_steering[m_behaviour]->getKinematics(*this);
+
+	if (m_behaviour == STEER_PATH)
+		m_target = m_path.getNextWaypoint();
 	
 	if (latest.move == true)
 	{
@@ -166,10 +204,13 @@ void Agent::update(float dt)
 		if (m_steps.curtime >= m_steps.maxTime)
 		{
 			m_steps.curtime = 0.0f;
-			m_steps.pos[m_steps.cnt] = getPosition()/* + sprite.getOrigin()*/;
+			m_steps.pos[m_steps.cnt] = getPosition();
 			++m_steps.cnt;
 			if (m_steps.cnt >= 10)
 				m_steps.cnt = 0;
 		}
+		
+		//collision
+		Kinematics collision = m_steering[2]->getKinematics(*this);
 	}
 }

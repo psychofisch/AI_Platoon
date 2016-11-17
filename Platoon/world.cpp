@@ -38,6 +38,7 @@ void world::run()
 	tester.setColor(sf::Color(41, 255, 249));
 	tester.setMaxSpeed(100.0f);
 	tester.setMaxAcc(1.0f);
+	tester.setObstaclePointer(&m_gameobjects);
 
 	//m_scene.push_back(&tester);
 
@@ -133,7 +134,7 @@ void world::run()
 		}
 
 		tester.update(dt);
-		tester.drawSteps(m_window);
+		tester.drawDebug(m_window);
 		m_window->draw(tester.sprite);
 
 		m_window->setView(m_window->getDefaultView());

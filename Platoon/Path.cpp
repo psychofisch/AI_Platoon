@@ -16,12 +16,26 @@ Path::~Path()
 
 sf::Vector2f Path::getWaypoint(int i) const
 {
+	if (i >= m_path.size())
+	{
+		if (m_loop)
+			while (i >= m_path.size())
+				i -= m_path.size();
+		else
+			i = m_path.size() - 1;
+	}
+
 	return m_path[i];
 }
 
 sf::Vector2f Path::getNextWaypoint() const
 {
 	return m_path[m_nextWaypoint];
+}
+
+int Path::getNextWayPointIndex() const
+{
+	return m_nextWaypoint;
 }
 
 int Path::size()

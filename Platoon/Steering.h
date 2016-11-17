@@ -33,3 +33,12 @@ public:
 
 	Kinematics getKinematics(Agent& agent);
 };
+
+class ObstacleAvoid : public Steering {
+public:
+	ObstacleAvoid();
+	~ObstacleAvoid();
+
+	// Inherited via Steering
+	virtual Kinematics getKinematics(Agent & agent) override;
+};

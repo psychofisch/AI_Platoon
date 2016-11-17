@@ -25,6 +25,8 @@ public:
 	float getMaxAcc() const;
 	sf::Vector2f getTargetPos() const;
 	sf::Vector2f getVelocity() const;
+	void getWhiskers(sf::Vector2f* out) const; //out is a 3 vector array (left, center, right)
+	std::vector<gameobj>* getObstacles() const;
 	Path& getPath();
 
 	void moveTo(sf::Vector2f target);
@@ -34,8 +36,9 @@ public:
 	void setSprite(std::vector<sf::Texture*>& textures, const char * path);
 	void setColor(sf::Color color);
 	int addWaypoint(sf::Vector2f p);
+	void setObstaclePointer(std::vector<gameobj>* obstacle_ptr);
 
-	void drawSteps(sf::RenderWindow* wndw);
+	void drawDebug(sf::RenderWindow* wndw);
 	void update(float dt);
 
 private:
@@ -49,5 +52,6 @@ private:
 	steps m_steps;
 	sf::Color m_color;
 	Path m_path;
+	std::vector<gameobj>* m_obstacles;
 };
 

@@ -22,7 +22,7 @@ sf::Vector2f multiply(const sf::Vector2f & left, const sf::Vector2f & right)
 
 float angleD(const sf::Vector2f & v)
 {
-	return angleR(v)*(180 / sf::PI);
+	return radToDeg(angleR(v));
 }
 
 float angleR(const sf::Vector2f & v)
@@ -38,4 +38,14 @@ float radToDeg(float Rad)
 float degToRad(float d)
 {
 	return (d / 180.f) * sf::PI;
+}
+
+sf::Vector2f rotateD(sf::Vector2f v, float angle)
+{
+	angle = degToRad(angle);
+	float length = magnitude(v);
+	v = normalize(v);
+	float x = (v.x * cosf(angle)) - (v.y * sinf(angle));
+	float y = (v.x * sinf(angle)) + (v.y * cosf(angle));
+	return sf::Vector2f(x, y) * length;
 }
