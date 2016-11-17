@@ -11,6 +11,26 @@ Steering::~Steering()
 {
 }
 
+float Steering::rotate(float r)
+{
+	if (r > 360.f)
+		r -= 360.f;
+	else if (r < 0.f)
+		r += 360.f;
+
+	if (r > 181.f)
+		r = 1.0f;
+	else if (r < 179.f)
+		r = -1.0f;
+	else
+		r = 0;
+
+	r *= 200.0f;
+
+	//return
+	return r;
+}
+
 Arrive::Arrive()
 {
 }
@@ -50,18 +70,9 @@ Kinematics Arrive::getKinematics(Agent & agent)
 		result.linearAcc = (result.linearAcc / magnitude(result.linearAcc))*agent.getMaxAcc();
 
 	//rotation
-	float targetRot = angleD(targetDir) - agent.getRotation();
+	float targetRot = angleD(targetDir) - (agent.getRotation() - 180.f);
 
-	//std::cout << targetRot << std::endl;
-
-	if (targetRot > 1.0f)
-		targetRot = 1.0f;
-	else if (targetRot < -1.0)
-		targetRot = -1.0f;
-	else
-		targetRot = 0;
-
-	result.angular = targetRot * 200.0f;
+	result.angular = rotate(targetRot);
 
 	//return
 	result.move = true;
@@ -97,6 +108,10 @@ Kinematics Seek::getKinematics(Agent & agent)
 
 	if (magnitude(result.linearAcc) > agent.getMaxAcc())
 		result.linearAcc = (result.linearAcc / magnitude(result.linearAcc))*agent.getMaxAcc();
+
+	//rotation
+	float targetRot = angleD(targetDir) - (agent.getRotation() - 180.f);
+	result.angular = rotate(targetRot);
 
 	//return
 	result.move = true;

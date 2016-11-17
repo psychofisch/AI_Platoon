@@ -14,6 +14,8 @@ public:
 	~Steering();
 
 	virtual Kinematics getKinematics(Agent& agent) = 0;
+
+	float rotate(float r);
 };
 
 class Arrive : public Steering {
