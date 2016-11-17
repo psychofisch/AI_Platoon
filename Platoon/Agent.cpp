@@ -3,7 +3,10 @@
 
 Agent::Agent()
 {
+	m_behaviour = STEER_FREE;
+
 	m_steering.push_back(new Arrive());
+	m_steering.push_back(new Seek());
 
 	sf::Texture* steps_tex = new sf::Texture();
 	steps_tex->loadFromFile("steps.png");
@@ -101,8 +104,15 @@ void Agent::setColor(sf::Color color)
 	sprite.setColor(m_color);
 }
 
+int Agent::addWaypoint(sf::Vector2f p)
+{
+	m_behaviour = STEER_PATH;
+	return m_path.addWaypoint(p);
+}
+
 void Agent::drawSteps(sf::RenderWindow * wndw)
 {
+	//draw steps
 	m_stepsSprite.setColor(m_color);
 	for (int i = 0; i < 10; ++i)
 	{
@@ -110,16 +120,34 @@ void Agent::drawSteps(sf::RenderWindow * wndw)
 		wndw->draw(m_stepsSprite);
 	}
 
-	m_stepsSprite.setPosition(m_target);
-	m_stepsSprite.setColor(sf::Color::Red);
-	wndw->draw(m_stepsSprite);
+	//draw path&target
+	if (m_behaviour == STEER_PATH)
+	{
+		m_stepsSprite.setColor(sf::Color(77, 255, 54, 255));
+		for (int i = 0; i < m_path.size(); ++i)
+		{
+			m_stepsSprite.setPosition(m_path.getWaypoint(i));
+			wndw->draw(m_stepsSprite);
+		}
+		m_stepsSprite.setPosition(m_path.getNextWaypoint());
+		m_stepsSprite.setColor(sf::Color::Red);
+		wndw->draw(m_stepsSprite);
+	}
+	else
+	{
+		m_stepsSprite.setPosition(m_target);
+		m_stepsSprite.setColor(sf::Color::Red);
+		wndw->draw(m_stepsSprite);
+	}
+
+	//reset
 	m_stepsSprite.setColor(sf::Color::White);
 }
 
 void Agent::update(float dt)
 {
 	//movement
-	Kinematics latest = m_steering[0]->getKinematics(*this);
+	Kinematics latest = m_steering[m_behaviour]->getKinematics(*this);
 	
 	if (latest.move == true)
 	{

@@ -67,6 +67,12 @@ void world::run()
 				std::cout << mousePos_mapped.x << "," << mousePos_mapped.y << std::endl;
 				break;
 			}
+			else if (eve.type == sf::Event::MouseButtonPressed && eve.mouseButton.button == sf::Mouse::Right)
+			{
+				tester.addWaypoint(mousePos_mapped);
+				std::cout << mousePos_mapped.x << "," << mousePos_mapped.y << std::endl;
+				break;
+			}
 			else if (eve.type == sf::Event::MouseWheelScrolled)
 			{
 				//std::cout << "wheel delta > " << eve.mouseWheelScroll.delta << std::endl;

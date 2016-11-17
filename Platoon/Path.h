@@ -13,13 +13,15 @@ public:
 	~Path();
 
 	sf::Vector2f getWaypoint(int i) const;
-	sf::Vector2f getCurrentWaypoint() const;
+	sf::Vector2f getNextWaypoint() const;
+	int size();
 
 	int addWaypoint(sf::Vector2f p);
-	int findClosestWaypoint(sf::Vector2f p);
+	int findNextWaypoint(sf::Vector2f p);
 
 private:
+	bool m_loop;
+	int m_currentWaypoint, m_nextWaypoint;
 	std::vector<sf::Vector2f> m_path;
-	int m_currentWaypoint;
 };
 

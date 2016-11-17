@@ -3,6 +3,9 @@
 
 
 Path::Path()
+	:m_loop(true),
+	m_currentWaypoint(0),
+	m_nextWaypoint(0)
 {
 }
 
@@ -16,9 +19,14 @@ sf::Vector2f Path::getWaypoint(int i) const
 	return m_path[i];
 }
 
-sf::Vector2f Path::getCurrentWaypoint() const
+sf::Vector2f Path::getNextWaypoint() const
 {
-	return m_path[m_currentWaypoint];
+	return m_path[m_nextWaypoint];
+}
+
+int Path::size()
+{
+	return m_path.size();
 }
 
 int Path::addWaypoint(sf::Vector2f p)
@@ -27,10 +35,11 @@ int Path::addWaypoint(sf::Vector2f p)
 	return m_path.size();
 }
 
-int Path::findClosestWaypoint(sf::Vector2f p)
+int Path::findNextWaypoint(sf::Vector2f p)
 {
 	int closest = -1;
 	float dist = INFINITY;
+
 	for (int i = 0; i < m_path.size(); ++i)
 	{
 		float dist_tmp = magnitude(p - m_path[i]);
@@ -41,5 +50,19 @@ int Path::findClosestWaypoint(sf::Vector2f p)
 		}
 	}
 
-	return closest;
+	if (closest == m_nextWaypoint)
+	{
+		m_currentWaypoint = m_nextWaypoint;
+		if (m_nextWaypoint == m_path.size() - 1)
+		{
+			if(m_loop)
+				m_nextWaypoint = 0;
+		}
+		else
+		{
+			m_nextWaypoint++;
+		}
+	}
+
+	return m_nextWaypoint;
 }

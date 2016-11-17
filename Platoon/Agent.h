@@ -15,10 +15,10 @@ class Agent : public gameobj
 	};
 
 public:
-	enum SteerMode { STEER_NONE, STEER_ARRIVE };
+	enum SteerMode { STEER_FREE = 0, STEER_PATH = 1 };
 
 	Agent();
-	Agent(int mode);
+	//Agent(int mode);
 	~Agent();
 
 	float getMaxSpeed() const;
@@ -33,6 +33,7 @@ public:
 	bool setMaxAcc(float newMaxAcc);
 	void setSprite(std::vector<sf::Texture*>& textures, const char * path);
 	void setColor(sf::Color color);
+	int addWaypoint(sf::Vector2f p);
 
 	void drawSteps(sf::RenderWindow* wndw);
 	void update(float dt);
@@ -40,6 +41,7 @@ public:
 private:
 	float m_maxSpeed;
 	float m_maxAcc;
+	SteerMode m_behaviour;
 	sf::Vector2f m_velocity;
 	sf::Vector2f m_target;
 	std::vector<Steering*> m_steering;

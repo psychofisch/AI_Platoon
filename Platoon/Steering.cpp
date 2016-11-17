@@ -52,7 +52,7 @@ Kinematics Arrive::getKinematics(Agent & agent)
 	//rotation
 	float targetRot = angleD(targetDir) - agent.getRotation();
 
-	std::cout << targetRot << std::endl;
+	//std::cout << targetRot << std::endl;
 
 	if (targetRot > 1.0f)
 		targetRot = 1.0f;
@@ -79,7 +79,14 @@ Seek::~Seek()
 Kinematics Seek::getKinematics(Agent & agent)
 {
 	Kinematics result;
-	sf::Vector2f targetDir = agent.getTargetPos() - agent.getPosition();
+	Path& p = agent.getPath();
+
+	if (p.size() == 0)
+		return result;
+
+	int nwp = p.findNextWaypoint(agent.getPosition());
+
+	sf::Vector2f targetDir = p.getWaypoint(nwp) - agent.getPosition();
 	float d = magnitude(targetDir);
 
 	//movement

@@ -154,6 +154,7 @@
     <ClCompile Include="Agent.cpp" />
     <ClCompile Include="FileIO.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Path.cpp" />
     <ClCompile Include="vector2math.cpp" />
     <ClCompile Include="Steering.cpp" />
     <ClCompile Include="world.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="FileIO.h" />
     <ClInclude Include="gameobj.h" />
     <ClInclude Include="Kinematics.h" />
+    <ClInclude Include="Path.h" />
     <ClInclude Include="vector2math.h" />
     <ClInclude Include="Steering.h" />
     <ClInclude Include="world.h" />
