@@ -37,11 +37,12 @@ public:
 	void setColor(sf::Color color);
 	int addWaypoint(sf::Vector2f p);
 	void setObstaclePointer(std::vector<gameobj>* obstacle_ptr);
+	void setRenderWindow(sf::RenderWindow* rndwndw);
 
 	void drawDebug(sf::RenderWindow* wndw);
 	void update(float dt);
 
-private:
+//private:
 	float m_maxSpeed;
 	float m_maxAcc;
 	SteerMode m_behaviour;
@@ -53,5 +54,8 @@ private:
 	sf::Color m_color;
 	Path m_path;
 	std::vector<gameobj>* m_obstacles;
+
+	//DEBUG
+	sf::RenderWindow* m_wndw;
 };
 

@@ -49,3 +49,40 @@ sf::Vector2f rotateD(sf::Vector2f v, float angle)
 	float y = (v.x * sinf(angle)) + (v.y * cosf(angle));
 	return sf::Vector2f(x, y) * length;
 }
+
+void getRealCorners(const sf::Sprite & sprite, sf::Vector2f* out)
+{
+	sf::FloatRect srect = sprite.getLocalBounds();
+
+	out[0] = sprite.getTransform().transformPoint(srect.left, srect.top);
+	out[1] = sprite.getTransform().transformPoint(srect.width, srect.top);
+	out[2] = sprite.getTransform().transformPoint(srect.width, srect.height);
+	out[3] = sprite.getTransform().transformPoint(srect.left, srect.height);
+}
+
+sf::Vector2f lineIntersection(sf::Vector2fLines l1, sf::Vector2fLines l2)
+{
+	//todo: http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+	sf::Vector2f intersection;
+
+	intersection.x = ((((l1.p1.x*l1.p2.y) - (l1.p1.y*l1.p2.x))*(l2.p1.x - l2.p2.x)) - ((l1.p1.x - l1.p2.x)*((l2.p1.x*l2.p2.y) - (l2.p1.y*l2.p2.x))))
+						/ (((l1.p1.x - l1.p2.x)*(l2.p1.y - l2.p2.y)) - ((l1.p1.y - l1.p2.y)*(l2.p1.x - l2.p2.x)));
+
+	intersection.y = ((((l1.p1.x*l1.p2.y) - (l1.p1.y*l1.p2.x))*(l2.p1.y - l2.p2.y)) - ((l1.p1.y - l1.p2.y)*((l2.p1.x*l2.p2.y) - (l2.p1.y*l2.p2.x))))
+						/ (((l1.p1.x - l1.p2.x)*(l2.p1.y - l2.p2.y)) - ((l1.p1.y - l1.p2.y)*(l2.p1.x - l2.p2.x)));
+
+	return intersection;
+}
+
+float cross2D(sf::Vector2f a, sf::Vector2f b)
+{
+	return (a.x*b.y)-(a.y*b.x);
+}
+
+bool isBetween(sf::Vector2f a, sf::Vector2f p, sf::Vector2f b)
+{
+	if (magnitude(p - a) < magnitude(b - a))
+		return true;
+	else
+		return false;
+}

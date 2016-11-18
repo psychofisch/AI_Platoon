@@ -133,6 +133,11 @@ void Agent::setObstaclePointer(std::vector<gameobj>* obstacle_ptr)
 	m_obstacles = obstacle_ptr;
 }
 
+void Agent::setRenderWindow(sf::RenderWindow * rndwndw)
+{
+	m_wndw = rndwndw;
+}
+
 void Agent::drawDebug(sf::RenderWindow * wndw)
 {
 	//draw steps
@@ -175,6 +180,19 @@ void Agent::drawDebug(sf::RenderWindow * wndw)
 		wndw->draw(lineShape);
 	}
 
+	//debug rectangle corners
+	m_stepsSprite.setColor(sf::Color::Red);
+	for (gameobj go : *m_obstacles)
+	{
+		sf::Vector2f rC[4];
+		getRealCorners(go.sprite, rC);
+		for (int i = 0; i < 4; ++i)
+		{
+			m_stepsSprite.setPosition(rC[i]);
+			wndw->draw(m_stepsSprite);
+		}
+	}
+
 	//reset
 	m_stepsSprite.setColor(sf::Color::White);
 }
@@ -183,19 +201,24 @@ void Agent::update(float dt)
 {
 	//movement
 	Kinematics latest = m_steering[m_behaviour]->getKinematics(*this);
+	Kinematics collision = m_steering[2]->getKinematics(*this);
+
+	Kinematics doIt = latest;
+	if (collision.move == true)
+		doIt = collision;
 
 	if (m_behaviour == STEER_PATH)
 		m_target = m_path.getNextWaypoint();
 	
-	if (latest.move == true)
+	if (doIt.move == true)
 	{
-		m_velocity += latest.linearAcc;
+		m_velocity += doIt.linearAcc;
 
 		if (magnitude(m_velocity) > m_maxSpeed)
 			m_velocity = normalize(m_velocity) * m_maxSpeed;
 
 		setPosition(getPosition() + (m_velocity * dt));
-		setRotation(getRotation() + (latest.angular * dt));
+		setRotation(getRotation() + (doIt.angular * dt));
 
 		//std::cout << magnitude(m_velocity) << std::endl;
 
@@ -209,8 +232,5 @@ void Agent::update(float dt)
 			if (m_steps.cnt >= 10)
 				m_steps.cnt = 0;
 		}
-		
-		//collision
-		Kinematics collision = m_steering[2]->getKinematics(*this);
 	}
 }

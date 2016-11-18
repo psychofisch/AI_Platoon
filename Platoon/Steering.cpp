@@ -130,13 +130,65 @@ Kinematics ObstacleAvoid::getKinematics(Agent & agent)
 {
 	Kinematics result;
 	std::vector<gameobj> obst = *agent.getObstacles();
+	int collisionInd = -1;
 	sf::Vector2f w[3];
 	agent.getWhiskers(w);
 	for (int i = 0; i < obst.size(); ++i)
 	{
 		if (obst[i].sprite.getGlobalBounds().contains(agent.getPosition() + w[1]))
-			std::cout << "collision!\n";
+		{
+			collisionInd = i;
+			//std::cout << "collision!\n";
+			break;
+		}
 	}
 
+	if (collisionInd == -1)
+		return result;
+
+	sf::Vector2f realCorners[4];
+	getRealCorners(obst[collisionInd].sprite, realCorners);
+
+	agent.m_stepsSprite.setColor(sf::Color::Magenta);
+	sf::Vector2f intersection(100.f, 100.f);
+	int intersectionIndex = -1;
+	for (int i = 0; i < 4; ++i)
+	{
+		sf::Vector2f tmp;
+		int j = i + 1;
+		if (i == 3)
+			j = 0;
+		
+		tmp = lineIntersection(sf::Vector2fLines(agent.getPosition(), agent.getPosition() + w[1]), sf::Vector2fLines(realCorners[i], realCorners[j]));
+
+		if (magnitude(tmp - agent.getPosition()) < magnitude(intersection - agent.getPosition())
+				&& isBetween(realCorners[j], tmp, realCorners[i]))
+		{
+			intersection = tmp;
+			intersectionIndex = i;
+		}
+
+		//std::cout << intersection.x << ":" << intersection.y << std::endl;
+	}
+
+	if (!obst[collisionInd].sprite.getGlobalBounds().contains(intersection) || magnitude(intersection - agent.getPosition()) > magnitude(w[1]))
+		return result;
+
+	agent.m_stepsSprite.setPosition(intersection);
+	agent.m_wndw->draw(agent.m_stepsSprite);
+
+	sf::Vector2f normal1(realCorners[(intersectionIndex == 3) ? 0 : intersectionIndex + 1].y - realCorners[intersectionIndex].y, -(realCorners[(intersectionIndex == 3) ? 0 : intersectionIndex + 1].x - realCorners[intersectionIndex].x));
+	sf::Vector2f normal2(-normal1.x, -normal1.y);
+
+	//if (magnitude(intersection - agent.getPosition() - normal1) < magnitude(intersection - agent.getPosition() - normal2))
+	//	normal1 = normal2;
+
+	agent.m_stepsSprite.setPosition(normal1);
+	agent.m_wndw->draw(agent.m_stepsSprite);
+
+	normal1 = normalize(normal1);
+
+	result.linearAcc = normal1 * agent.getMaxAcc();
+	result.move = true;
 	return result;
 }

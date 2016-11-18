@@ -39,6 +39,7 @@ void world::run()
 	tester.setMaxSpeed(100.0f);
 	tester.setMaxAcc(1.0f);
 	tester.setObstaclePointer(&m_gameobjects);
+	tester.setRenderWindow(m_window);
 
 	//m_scene.push_back(&tester);
 

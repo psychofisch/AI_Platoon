@@ -173,6 +173,7 @@ sf::Vector2f FileIO::LoadLevel(const char* path, std::vector<gameobj>& obstacles
 			tmp_obj.setPosition(pos);
 			tmp_obj.setRotation(rot);
 			tmp_obj.sprite.setTexture(*textures[tmp_obj.textureId+1]);
+			tmp_obj.sprite.setOrigin(textures[tmp_obj.textureId + 1]->getSize().x / 2, textures[tmp_obj.textureId + 1]->getSize().y / 2);
 			obstacles.push_back(tmp_obj);
 
 			std::cout << "index = " << tmp_obj.textureId << ", position = " << pos.x << ":" << pos.y << std::endl;
