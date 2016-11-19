@@ -86,3 +86,11 @@ bool isBetween(sf::Vector2f a, sf::Vector2f p, sf::Vector2f b)
 	else
 		return false;
 }
+
+bool isNotZero(sf::Vector2f & v)
+{
+	if (v.x != 0.0f && v.y != 0.0f)
+		return true;
+	else
+		return false;
+}

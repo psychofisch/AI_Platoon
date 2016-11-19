@@ -130,26 +130,38 @@ Kinematics ObstacleAvoid::getKinematics(Agent & agent)
 {
 	Kinematics result;
 	std::vector<gameobj> obst = *agent.getObstacles();
-	int collisionInd = -1;
+	int collisionInd[3] = { -1 };
 	sf::Vector2f w[3];
 	agent.getWhiskers(w);
-	for (int i = 0; i < obst.size(); ++i)
+	for (int i = 0; i < 3; ++i)
 	{
-		if (obst[i].sprite.getGlobalBounds().contains(agent.getPosition() + w[1]))
+		for (int o = 0; o < obst.size(); ++o)
 		{
-			collisionInd = i;
-			//std::cout << "collision!\n";
-			break;
+			if (obst[o].sprite.getGlobalBounds().contains(agent.getPosition() + w[i]))
+			{
+				collisionInd[i] = o;
+				//std::cout << "collision!\n";
+				break;
+			}
 		}
+
+		if(collisionInd[i] != -1)
+			result.linearAcc += i_collides(agent, obst[collisionInd[i]].sprite, w[i]);
 	}
 
-	if (collisionInd == -1)
-		return result;
+	if (!isNotZero(result.linearAcc))
+		return Kinematics();
+	result.linearAcc = normalize(result.linearAcc) * agent.getMaxAcc();
+	result.move = true;
+	return result;
+}
 
+sf::Vector2f ObstacleAvoid::i_collides(Agent& a, sf::Sprite& s, sf::Vector2f w)
+{
 	sf::Vector2f realCorners[4];
-	getRealCorners(obst[collisionInd].sprite, realCorners);
+	getRealCorners(s, realCorners);
 
-	agent.m_stepsSprite.setColor(sf::Color::Magenta);
+	a.m_stepsSprite.setColor(sf::Color::Magenta);
 	sf::Vector2f intersection(100.f, 100.f);
 	int intersectionIndex = -1;
 	for (int i = 0; i < 4; ++i)
@@ -158,11 +170,11 @@ Kinematics ObstacleAvoid::getKinematics(Agent & agent)
 		int j = i + 1;
 		if (i == 3)
 			j = 0;
-		
-		tmp = lineIntersection(sf::Vector2fLines(agent.getPosition(), agent.getPosition() + w[1]), sf::Vector2fLines(realCorners[i], realCorners[j]));
 
-		if (magnitude(tmp - agent.getPosition()) < magnitude(intersection - agent.getPosition())
-				&& isBetween(realCorners[j], tmp, realCorners[i]))
+		tmp = lineIntersection(sf::Vector2fLines(a.getPosition(), a.getPosition() + w), sf::Vector2fLines(realCorners[i], realCorners[j]));
+
+		if (magnitude(tmp - a.getPosition()) < magnitude(intersection - a.getPosition())
+			&& isBetween(realCorners[j], tmp, realCorners[i]))
 		{
 			intersection = tmp;
 			intersectionIndex = i;
@@ -171,11 +183,11 @@ Kinematics ObstacleAvoid::getKinematics(Agent & agent)
 		//std::cout << intersection.x << ":" << intersection.y << std::endl;
 	}
 
-	if (!obst[collisionInd].sprite.getGlobalBounds().contains(intersection) || magnitude(intersection - agent.getPosition()) > magnitude(w[1]))
-		return result;
+	if (!s.getGlobalBounds().contains(intersection) || magnitude(intersection - a.getPosition()) > magnitude(w))
+		return sf::Vector2f(0.f, 0.f);
 
-	agent.m_stepsSprite.setPosition(intersection);
-	agent.m_wndw->draw(agent.m_stepsSprite);
+	a.m_stepsSprite.setPosition(intersection);
+	a.m_wndw->draw(a.m_stepsSprite);
 
 	sf::Vector2f normal1(realCorners[(intersectionIndex == 3) ? 0 : intersectionIndex + 1].y - realCorners[intersectionIndex].y, -(realCorners[(intersectionIndex == 3) ? 0 : intersectionIndex + 1].x - realCorners[intersectionIndex].x));
 	sf::Vector2f normal2(-normal1.x, -normal1.y);
@@ -183,12 +195,8 @@ Kinematics ObstacleAvoid::getKinematics(Agent & agent)
 	//if (magnitude(intersection - agent.getPosition() - normal1) < magnitude(intersection - agent.getPosition() - normal2))
 	//	normal1 = normal2;
 
-	agent.m_stepsSprite.setPosition(normal1);
-	agent.m_wndw->draw(agent.m_stepsSprite);
+	a.m_stepsSprite.setPosition(normal1);
+	a.m_wndw->draw(a.m_stepsSprite);
 
-	normal1 = normalize(normal1);
-
-	result.linearAcc = normal1 * agent.getMaxAcc();
-	result.move = true;
-	return result;
+	return normalize(normal1);
 }
