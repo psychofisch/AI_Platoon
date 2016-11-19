@@ -56,7 +56,10 @@ void Agent::getWhiskers(sf::Vector2f * out) const
 {
 	float angle = 20.f;
 	//center ray
-	out[1] = m_velocity * 2.0f;
+	if (magnitude(m_velocity) < sprite.getOrigin().x)
+		out[1] = normalize(m_velocity) * sprite.getOrigin().x;
+	else
+		out[1] = m_velocity;
 
 	//whiskers
 	out[0] = rotateD(out[1], angle) * 0.5f;

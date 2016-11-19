@@ -94,3 +94,8 @@ bool isNotZero(sf::Vector2f & v)
 	else
 		return false;
 }
+
+sf::FloatRect growBox(sf::FloatRect & r, float f)
+{
+	return sf::FloatRect(r.left - f, r.top - f, r.width + f, r.height + f);
+}

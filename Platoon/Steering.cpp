@@ -183,7 +183,7 @@ sf::Vector2f ObstacleAvoid::i_collides(Agent& a, sf::Sprite& s, sf::Vector2f w)
 		//std::cout << intersection.x << ":" << intersection.y << std::endl;
 	}
 
-	if (!s.getGlobalBounds().contains(intersection) || magnitude(intersection - a.getPosition()) > magnitude(w))
+	if (!growBox(s.getGlobalBounds(), 10.0f).contains(intersection) || magnitude(intersection - a.getPosition()) > magnitude(w))
 		return sf::Vector2f(0.f, 0.f);
 
 	a.m_stepsSprite.setPosition(intersection);

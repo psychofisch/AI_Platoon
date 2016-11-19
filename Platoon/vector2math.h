@@ -29,3 +29,4 @@ sf::Vector2f lineIntersection(sf::Vector2fLines l1, sf::Vector2fLines l2);
 float cross2D(sf::Vector2f a, sf::Vector2f b);
 bool isBetween(sf::Vector2f a, sf::Vector2f p, sf::Vector2f b);
 bool isNotZero(sf::Vector2f& v);
+sf::FloatRect growBox(sf::FloatRect& r, float f);
