@@ -15,10 +15,10 @@ class Agent : public gameobj
 	};
 
 public:
-	enum SteerMode { STEER_FREE = 0, STEER_PATH = 1 };
+	enum SteerMode { STEER_FREE = 0, STEER_PATH = 1, STEER_SEPARATION = 2, STEER_COLLISION = 3 };
 
 	Agent();
-	//Agent(int mode);
+	Agent(const Agent& a);
 	~Agent();
 
 	float getMaxSpeed() const;
@@ -27,22 +27,29 @@ public:
 	sf::Vector2f getVelocity() const;
 	void getWhiskers(sf::Vector2f* out) const; //out is a 3 vector array (left, center, right)
 	std::vector<gameobj>* getObstacles() const;
+	std::vector<Agent>* getOtherAgents() const;
 	Path& getPath();
 
 	void moveTo(sf::Vector2f target);
 	//bool setSteering(int mode);//accepts SteerMode; int for compatibility
 	bool setMaxSpeed(float newMaxSpeed);//accepts Speeds > 0.0f; returns True if value is accepted
 	bool setMaxAcc(float newMaxAcc);
-	void setSprite(std::vector<sf::Texture*>& textures, const char * path);
+	void setSprite(const sf::Texture* tex);
+	//void setSprite(std::vector<sf::Texture*>& textures, const char * path);
 	void setColor(sf::Color color);
 	int addWaypoint(sf::Vector2f p);
 	void setObstaclePointer(std::vector<gameobj>* obstacle_ptr);
+	void setAgentPointer(std::vector<Agent>* agent_ptr);
 	void setRenderWindow(sf::RenderWindow* rndwndw);
 
 	void drawDebug(sf::RenderWindow* wndw);
 	void update(float dt);
 
-//private:
+#ifndef _DEBUG
+private:
+#endif
+	void i_init();
+
 	float m_maxSpeed;
 	float m_maxAcc;
 	SteerMode m_behaviour;
@@ -54,6 +61,7 @@ public:
 	sf::Color m_color;
 	Path m_path;
 	std::vector<gameobj>* m_obstacles;
+	std::vector<Agent>* m_otherAgents;
 
 	//DEBUG
 	sf::RenderWindow* m_wndw;

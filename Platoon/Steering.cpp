@@ -200,3 +200,37 @@ sf::Vector2f ObstacleAvoid::i_collides(Agent& a, sf::Sprite& s, sf::Vector2f w)
 
 	return normalize(normal1);
 }
+
+Separation::Separation()
+{
+}
+
+Separation::~Separation()
+{
+}
+
+Kinematics Separation::getKinematics(Agent & agent)
+{
+	Kinematics result;
+	std::vector<Agent>* others = agent.getOtherAgents();
+
+	for (auto&& a : *others)
+	{
+		if (&a == &agent)
+			continue;
+		sf::Vector2f space = agent.getPosition() - a.getPosition();
+		float dist = magnitude(space);
+		if (/*dist == 0.0f || */dist > 60.f)
+			continue;
+
+		result.move = true;
+		//float factor = 1/(dist*dist);//quadratic
+		float factor = (60.f - dist) / 60.f;
+		result.linearAcc += factor * space;
+	}
+
+	if (magnitude(result.linearAcc) > 1.0f)
+		result.linearAcc = normalize(result.linearAcc);
+	result.linearAcc *= agent.getMaxAcc();
+	return result;
+}

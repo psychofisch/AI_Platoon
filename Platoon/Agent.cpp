@@ -3,11 +3,56 @@
 
 Agent::Agent()
 {
+	i_init();
+}
+
+Agent::Agent(const Agent & a)
+	:m_maxAcc(a.m_maxAcc),
+	m_maxSpeed(a.m_maxSpeed),
+	m_behaviour(a.m_behaviour),
+	m_velocity(a.m_velocity),
+	m_target(a.m_target),
+	m_steps(a.m_steps),
+	m_path(a.m_path),
+	m_obstacles(a.m_obstacles),
+	m_otherAgents(a.m_otherAgents),
+	m_wndw(a.m_wndw)
+{
+	i_init();
+
+	sf::Texture* steps_tex = new sf::Texture(*(a.m_stepsSprite.getTexture()));
+
+	m_stepsSprite.setTexture(*steps_tex);
+	m_stepsSprite.setOrigin(steps_tex->getSize().x / 2, steps_tex->getSize().y / 2);
+	m_stepsSprite.scale(0.5f, 0.5f);
+
+	setSprite(a.sprite.getTexture());
+
+	setColor(a.m_color);
+	setPosition(a.getPosition());
+	moveTo(a.getPosition());
+}
+
+Agent::~Agent()
+{
+	for (Steering* s : m_steering)
+	{
+		delete s;
+	}
+}
+
+void Agent::i_init()
+{
 	m_behaviour = STEER_FREE;
 
-	m_steering.push_back(new Arrive());
-	m_steering.push_back(new Seek());
-	m_steering.push_back(new ObstacleAvoid());
+	m_steering.resize(4);
+	m_steering[STEER_FREE] = new Arrive();
+	m_steering[STEER_PATH] = new Seek();
+	m_steering[STEER_SEPARATION] = new Separation();
+	m_steering[STEER_COLLISION] = new ObstacleAvoid();
+
+	sf::Texture* player_tex = new sf::Texture();
+	player_tex->loadFromFile("player.png");
 
 	sf::Texture* steps_tex = new sf::Texture();
 	steps_tex->loadFromFile("steps.png");
@@ -21,15 +66,6 @@ Agent::Agent()
 	m_steps.curtime = 0.0f;
 
 	m_color = sf::Color(255, 255, 255);
-}
-
-
-Agent::~Agent()
-{
-	for (Steering* s : m_steering)
-	{
-		delete s;
-	}
 }
 
 float Agent::getMaxSpeed() const
@@ -71,6 +107,11 @@ std::vector<gameobj>* Agent::getObstacles() const
 	return m_obstacles;
 }
 
+std::vector<Agent>* Agent::getOtherAgents() const
+{
+	return m_otherAgents;
+}
+
 Path& Agent::getPath()
 {
 	return m_path;
@@ -109,15 +150,21 @@ bool Agent::setMaxAcc(float newMaxAcc)
 	return true;
 }
 
-void Agent::setSprite(std::vector<sf::Texture*>& textures, const char * path)
+void Agent::setSprite(const sf::Texture * tex)
 {
-	sf::Texture* tmp_tex = new sf::Texture;
-	tmp_tex->loadFromFile(path);
-	textures.push_back(tmp_tex);
-
-	sprite.setTexture(*textures[textures.size() - 1]);
+	sprite.setTexture(*tex);
 	sprite.setOrigin(sprite.getTextureRect().width / 2, sprite.getTextureRect().height / 2);
 }
+
+//void Agent::setSprite(std::vector<sf::Texture*>& textures, const char * path)
+//{
+//	sf::Texture* tmp_tex = new sf::Texture();
+//	tmp_tex->loadFromFile(path);
+//	textures.push_back(tmp_tex);
+//
+//	sprite.setTexture(*textures[textures.size() - 1]);
+//	sprite.setOrigin(sprite.getTextureRect().width / 2, sprite.getTextureRect().height / 2);
+//}
 
 void Agent::setColor(sf::Color color)
 {
@@ -134,6 +181,11 @@ int Agent::addWaypoint(sf::Vector2f p)
 void Agent::setObstaclePointer(std::vector<gameobj>* obstacle_ptr)
 {
 	m_obstacles = obstacle_ptr;
+}
+
+void Agent::setAgentPointer(std::vector<Agent>* agent_ptr)
+{
+	m_otherAgents = agent_ptr;
 }
 
 void Agent::setRenderWindow(sf::RenderWindow * rndwndw)
@@ -176,7 +228,7 @@ void Agent::drawDebug(sf::RenderWindow * wndw)
 	for (int i = 0; i < 3; ++i)
 	{
 		sf::Vector2f line(w[i]);
-		sf::RectangleShape lineShape(sf::Vector2f(magnitude(line), 5));
+		sf::RectangleShape lineShape(sf::Vector2f(magnitude(line), 2));
 		lineShape.setFillColor(sf::Color::Magenta);
 		lineShape.setRotation(angleD(line));
 		lineShape.setPosition(getPosition());
@@ -203,12 +255,15 @@ void Agent::drawDebug(sf::RenderWindow * wndw)
 void Agent::update(float dt)
 {
 	//movement
-	Kinematics latest = m_steering[m_behaviour]->getKinematics(*this);
-	Kinematics collision = m_steering[2]->getKinematics(*this);
+	Kinematics target = m_steering[m_behaviour]->getKinematics(*this);
+	Kinematics separation = m_steering[STEER_SEPARATION]->getKinematics(*this);
+	Kinematics collision = m_steering[STEER_COLLISION]->getKinematics(*this);
 
-	Kinematics doIt = latest;
+	Kinematics doIt = target;
 	if (collision.move == true)
 		doIt = collision;
+	else if (separation.move == true)
+		doIt = separation;
 
 	if (m_behaviour == STEER_PATH)
 		m_target = m_path.getNextWaypoint();

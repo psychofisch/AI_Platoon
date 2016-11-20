@@ -33,18 +33,27 @@ void world::run()
 	sf::Clock time;
 	float dt = 0.0f;
 
+	//init squad
+	//m_squad.push_back(Agent());
 	Agent tester;
-	tester.setSprite(m_textures, "player.png");
+	m_textures.push_back(new sf::Texture());
+	m_textures[m_textures.size() - 1]->loadFromFile("player.png");
+	tester.setSprite(m_textures[m_textures.size() - 1]);
 	tester.setColor(sf::Color(41, 255, 249));
 	tester.setMaxSpeed(100.0f);
-	tester.setMaxAcc(1.0f);
+	tester.setMaxAcc(10.0f);
 	tester.setObstaclePointer(&m_gameobjects);
+	tester.setAgentPointer(&m_squad);
 	tester.setRenderWindow(m_window);
-
-	//m_scene.push_back(&tester);
 
 	tester.setPosition(sf::Vector2f(50.0f, 50.0f));
 	tester.moveTo(sf::Vector2f(50.0f, 50.0f));
+
+	m_squad.push_back(tester);
+
+	tester.setPosition(sf::Vector2f(200.f, 200.f));
+	tester.moveTo(sf::Vector2f(200.f, 200.f));
+	m_squad.push_back(tester);
 
 	bool quit = false;
 	while (!quit)
@@ -65,13 +74,15 @@ void world::run()
 			}
 			else if (eve.type == sf::Event::MouseButtonPressed && eve.mouseButton.button == sf::Mouse::Left)
 			{
-				tester.moveTo(mousePos_mapped);
+				for(auto&& a : m_squad)
+					a.moveTo(mousePos_mapped);
 				std::cout << mousePos_mapped.x << "," << mousePos_mapped.y << std::endl;
 				break;
 			}
 			else if (eve.type == sf::Event::MouseButtonPressed && eve.mouseButton.button == sf::Mouse::Right)
 			{
-				tester.addWaypoint(mousePos_mapped);
+				for (auto&& a : m_squad)
+					a.addWaypoint(mousePos_mapped);
 				std::cout << mousePos_mapped.x << "," << mousePos_mapped.y << std::endl;
 				break;
 			}
@@ -93,7 +104,7 @@ void world::run()
 				switch (eve.key.code)
 				{
 				case sf::Keyboard::H:
-					std::cout << tester.getRotation() << std::endl;
+					std::cout << m_squad[0].getPosition().x << ":" << m_squad[0].getPosition().y << std::endl;
 					break;
 				case sf::Keyboard::R:
 					break;
@@ -111,15 +122,15 @@ void world::run()
 
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Middle) && !mouseMoveRect.contains(mousePos))
 		{
-			m_camera.move(normalize(sf::Vector2f(mousePos) - windowCenter)*10.0f);
+			m_camera.move(normalize(sf::Vector2f(mousePos) - windowCenter)*500.0f*dt);
 		}
 		//*** controls
 
 		//debugtext
-		std::stringstream debugText;
-		debugText << mousePos_mapped.x << ":" << mousePos_mapped.y;
-		debugText << std::endl << (mouseMoveRect.contains(mousePos) ? "INSIDE" : "OUTSIDE");
-		m_debugText.setString(debugText.str());
+		//std::stringstream debugText;
+		//debugText << mousePos_mapped.x << ":" << mousePos_mapped.y;
+		//debugText << std::endl << (mouseMoveRect.contains(mousePos) ? "INSIDE" : "OUTSIDE");
+		//m_debugText.setString(debugText.str());
 		//*** debugtext
 
 		//render
@@ -129,14 +140,17 @@ void world::run()
 
 		m_window->draw(m_worldSprite);
 
-		for (auto obstacle : m_gameobjects)
+		for (auto&& obstacle : m_gameobjects)
 		{
 			m_window->draw(obstacle.sprite);
 		}
 
-		tester.update(dt);
-		tester.drawDebug(m_window);
-		m_window->draw(tester.sprite);
+		for (auto&& agent : m_squad)
+		{
+			agent.update(dt);
+			m_window->draw(agent.sprite);
+			agent.drawDebug(m_window);
+		}
 
 		m_window->setView(m_window->getDefaultView());
 		m_window->draw(m_debugText);

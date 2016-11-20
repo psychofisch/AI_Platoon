@@ -45,3 +45,12 @@ public:
 private:
 	sf::Vector2f i_collides(Agent& a, sf::Sprite& s, sf::Vector2f w);
 };
+
+class Separation : public Steering {
+public:
+	Separation();
+	~Separation();
+
+	// Inherited via Steering
+	virtual Kinematics getKinematics(Agent & agent) override;
+};

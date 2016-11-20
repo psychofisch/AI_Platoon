@@ -89,13 +89,13 @@ bool isBetween(sf::Vector2f a, sf::Vector2f p, sf::Vector2f b)
 
 bool isNotZero(sf::Vector2f & v)
 {
-	if (v.x != 0.0f && v.y != 0.0f)
-		return true;
-	else
+	if (v.x == 0.0f && v.y == 0.0f)
 		return false;
+	else
+		return true;
 }
 
 sf::FloatRect growBox(sf::FloatRect & r, float f)
 {
-	return sf::FloatRect(r.left - f, r.top - f, r.width + f, r.height + f);
+	return sf::FloatRect(r.left - f, r.top - f, r.width + (f*2.f), r.height + (f*2.f));
 }

@@ -20,7 +20,7 @@ int main()
 	std::cout << "creating window...\n";
 	sf::RenderWindow window(vm, "Platoon", sf::Style::Titlebar | sf::Style::Close | sf::Style::Default, settings);
 	window.setVerticalSyncEnabled(false);
-	window.setFramerateLimit(60);
+	//window.setFramerateLimit(60);
 
 	world platoon(&window);
 	platoon.loadLevel("level1.x");
