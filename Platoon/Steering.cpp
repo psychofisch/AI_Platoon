@@ -218,14 +218,14 @@ Kinematics Separation::getKinematics(Agent & agent)
 	{
 		if (&a == &agent)
 			continue;
+		float e = 60.0f;
 		sf::Vector2f space = agent.getPosition() - a.getPosition();
 		float dist = magnitude(space);
-		if (/*dist == 0.0f || */dist > 60.f)
+		if (dist > e)
 			continue;
 
 		result.move = true;
-		//float factor = 1/(dist*dist);//quadratic
-		float factor = (60.f - dist) / 60.f;
+		float factor = (e - dist) / e;
 		result.linearAcc += factor * space;
 	}
 
