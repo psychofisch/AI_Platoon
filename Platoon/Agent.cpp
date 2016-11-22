@@ -122,6 +122,11 @@ void Agent::moveTo(sf::Vector2f target)
 	m_target = target;
 }
 
+void Agent::setSteering(SteerMode mode)
+{
+	m_behaviour = mode;
+}
+
 /*bool Agent::setSteering(int mode)
 {
 	if (mode == STEER_ARRIVE)
@@ -291,4 +296,44 @@ void Agent::update(float dt)
 				m_steps.cnt = 0;
 		}
 	}
+}
+
+int Formation::addAgents(Agent& a)
+{
+	a.setSteering(Agent::STEER_FREE);
+	m_agents.push_back(a);
+	return m_agents.size();
+}
+
+void Formation::update(float dt)
+{
+	Kinematics target = m_steering[m_behaviour]->getKinematics(*this);
+
+	if (target.move == true)
+	{
+		m_velocity += target.linearAcc;
+
+		if (magnitude(m_velocity) > m_maxSpeed)
+			m_velocity = normalize(m_velocity) * m_maxSpeed;
+
+		setPosition(getPosition() + (m_velocity * dt));
+		setRotation(getRotation() + (target.angular * dt));
+
+		for (int i = 0; i < m_agents.size(); ++i)
+		{
+			sf::Vector2f wedge = getPosition();
+			/*switch (i)
+			{
+			case 1: wedge -= (normalize(m_velocity) - sf::Vector2f(100.f, 100.f));
+			}*/
+
+			m_agents[i].moveTo(wedge);
+			m_agents[i].update(dt);
+		}
+	}
+}
+
+std::vector<Agent>& Formation::getAgents()
+{
+	return m_agents;
 }

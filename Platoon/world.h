@@ -35,7 +35,7 @@ private:
 	sf::Font m_font;
 	std::vector<gameobj*> m_scene;
 	std::vector<gameobj> m_gameobjects;
-	std::vector<Agent> m_squad;
+	Formation m_squad;
 	std::vector<sf::Texture*> m_textures;
 };
 

@@ -34,6 +34,12 @@ void world::run()
 	float dt = 0.0f;
 
 	//init squad
+	Formation formation;
+	formation.setPosition(sf::Vector2f(50.0f, 50.0f));
+	formation.moveTo(sf::Vector2f(50.0f, 50.0f));
+	formation.setMaxSpeed(100.0f);
+	formation.setMaxAcc(10.0f);
+
 	//m_squad.push_back(Agent());
 	Agent tester;
 	m_textures.push_back(new sf::Texture());
@@ -43,17 +49,16 @@ void world::run()
 	tester.setMaxSpeed(100.0f);
 	tester.setMaxAcc(10.0f);
 	tester.setObstaclePointer(&m_gameobjects);
-	tester.setAgentPointer(&m_squad);
 	tester.setRenderWindow(m_window);
 
 	tester.setPosition(sf::Vector2f(50.0f, 50.0f));
 	tester.moveTo(sf::Vector2f(50.0f, 50.0f));
 
-	m_squad.push_back(tester);
+	m_squad.addAgents(tester);
 
 	tester.setPosition(sf::Vector2f(200.f, 200.f));
 	tester.moveTo(sf::Vector2f(200.f, 200.f));
-	m_squad.push_back(tester);
+	m_squad.addAgents(tester);
 
 	bool quit = false;
 	while (!quit)
@@ -74,15 +79,17 @@ void world::run()
 			}
 			else if (eve.type == sf::Event::MouseButtonPressed && eve.mouseButton.button == sf::Mouse::Left)
 			{
-				for(auto&& a : m_squad)
-					a.moveTo(mousePos_mapped);
+				//for(auto&& a : m_squad)
+				//	a.moveTo(mousePos_mapped);
+				formation.setPosition(mousePos_mapped);
 				std::cout << mousePos_mapped.x << "," << mousePos_mapped.y << std::endl;
 				break;
 			}
 			else if (eve.type == sf::Event::MouseButtonPressed && eve.mouseButton.button == sf::Mouse::Right)
 			{
-				for (auto&& a : m_squad)
-					a.addWaypoint(mousePos_mapped);
+				//for (auto&& a : m_squad)
+				//	a.addWaypoint(mousePos_mapped);
+				formation.addWaypoint(mousePos_mapped);
 				std::cout << mousePos_mapped.x << "," << mousePos_mapped.y << std::endl;
 				break;
 			}
@@ -104,7 +111,8 @@ void world::run()
 				switch (eve.key.code)
 				{
 				case sf::Keyboard::H:
-					std::cout << m_squad[0].getPosition().x << ":" << m_squad[0].getPosition().y << std::endl;
+					//std::cout << m_squad[0].getPosition().x << ":" << m_squad[0].getPosition().y << std::endl;
+					std::cout << formation.getPosition().x << ":" << formation.getPosition().y << std::endl;
 					break;
 				case sf::Keyboard::R:
 					break;
@@ -145,9 +153,11 @@ void world::run()
 			m_window->draw(obstacle.sprite);
 		}
 
-		for (auto&& agent : m_squad)
+		formation.update(dt);
+		//for (auto&& agent : m_squad)
+		for (auto&& agent : formation.getAgents())
 		{
-			agent.update(dt);
+			//agent.update(dt);
 			m_window->draw(agent.sprite);
 			agent.drawDebug(m_window);
 		}

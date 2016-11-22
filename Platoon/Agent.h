@@ -31,7 +31,7 @@ public:
 	Path& getPath();
 
 	void moveTo(sf::Vector2f target);
-	//bool setSteering(int mode);//accepts SteerMode; int for compatibility
+	void setSteering(SteerMode mode);//accepts SteerMode; int for compatibility
 	bool setMaxSpeed(float newMaxSpeed);//accepts Speeds > 0.0f; returns True if value is accepted
 	bool setMaxAcc(float newMaxAcc);
 	void setSprite(const sf::Texture* tex);
@@ -43,7 +43,7 @@ public:
 	void setRenderWindow(sf::RenderWindow* rndwndw);
 
 	void drawDebug(sf::RenderWindow* wndw);
-	void update(float dt);
+	virtual void update(float dt);
 
 #ifndef _DEBUG
 private:
@@ -67,3 +67,12 @@ private:
 	sf::RenderWindow* m_wndw;
 };
 
+class Formation : public Agent {
+public:
+	int addAgents(Agent& a);
+	void update(float dt);
+
+	std::vector<Agent>& getAgents();
+private:
+	std::vector<Agent> m_agents;
+};
