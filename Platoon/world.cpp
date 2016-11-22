@@ -34,19 +34,22 @@ void world::run()
 	float dt = 0.0f;
 
 	//init squad
-	m_squad.setPosition(sf::Vector2f(50.0f, 50.0f));
+	m_squad.setPosition(sf::Vector2f(500.0f, 50.0f));
 	m_squad.moveTo(sf::Vector2f(50.0f, 50.0f));
-	m_squad.setMaxSpeed(100.0f);
-	m_squad.setMaxAcc(10.0f);
+	m_squad.setMaxSpeed(200.0f);
+	m_squad.setMaxAcc(3.0f);
+	m_squad.setEnemyPointer(nullptr);
 
 	Agent tester;
 	m_textures.push_back(new sf::Texture());
 	m_textures[m_textures.size() - 1]->loadFromFile("player.png");
 	tester.setSprite(m_textures[m_textures.size() - 1]);
 	tester.setColor(sf::Color(41, 255, 249));
-	tester.setMaxSpeed(100.0f);
+	tester.setMaxSpeed(300.0f);
 	tester.setMaxAcc(10.0f);
 	tester.setObstaclePointer(&m_gameobjects);
+	tester.setAgentPointer(&m_squad.getAgents());
+	tester.setEnemyPointer(&m_enemies);
 	tester.setRenderWindow(m_window);
 
 	tester.setPosition(sf::Vector2f(50.0f, 50.0f));
@@ -59,14 +62,18 @@ void world::run()
 	m_squad.addAgents(tester);
 	tester.setPosition(sf::Vector2f(100.f, 200.f));
 	m_squad.addAgents(tester);
+	tester.setPosition(sf::Vector2f(150.f, 200.f));
+	m_squad.addAgents(tester);
 
 	//Enemies
 	Agent enemy(tester);
+	enemy.setEnemyPointer(nullptr);
+	enemy.setAgentPointer(nullptr);
 	enemy.setColor(sf::Color(255, 229, 42, 255));
-	enemy.setPosition(sf::Vector2f(1040.f, 50.0f));
-	enemy.addWaypoint(sf::Vector2f(1040.f, 50.0f));
-	enemy.addWaypoint(sf::Vector2f(1041.f, 50.0f));
-	enemy.addWaypoint(sf::Vector2f(1042.f, 50.0f));
+	enemy.setPosition(sf::Vector2f(1040.f, 50.0f ));
+	enemy.addWaypoint(sf::Vector2f(1040.f, 50.0f ));
+	enemy.addWaypoint(sf::Vector2f(1041.f, 50.0f ));
+	enemy.addWaypoint(sf::Vector2f(1042.f, 50.0f ));
 	enemy.addWaypoint(sf::Vector2f(1040.f, 500.0f));
 	enemy.addWaypoint(sf::Vector2f(1041.f, 500.0f));
 	enemy.addWaypoint(sf::Vector2f(1042.f, 500.0f));
@@ -128,6 +135,7 @@ void world::run()
 					std::cout << m_squad.getPosition().x << ":" << m_squad.getPosition().y << std::endl;
 					break;
 				case sf::Keyboard::R:
+					m_squad.clearPath();
 					break;
 				case sf::Keyboard::Escape:
 					quit = true;

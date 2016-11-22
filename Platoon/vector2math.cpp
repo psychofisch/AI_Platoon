@@ -20,6 +20,11 @@ sf::Vector2f multiply(const sf::Vector2f & left, const sf::Vector2f & right)
 	return sf::Vector2f(left.x*right.x, left.y*right.y);
 }
 
+float dot(const sf::Vector2f & left, const sf::Vector2f & right)
+{
+	return (left.x*right.x) + (left.y*right.y);
+}
+
 float angleD(const sf::Vector2f & v)
 {
 	return radToDeg(angleR(v));
@@ -27,7 +32,7 @@ float angleD(const sf::Vector2f & v)
 
 float angleR(const sf::Vector2f & v)
 {
-	return atan2(v.y, v.x);
+	return atan2f(v.y, v.x);
 }
 
 float radToDeg(float Rad)
@@ -82,6 +87,14 @@ float cross2D(sf::Vector2f a, sf::Vector2f b)
 bool isBetween(sf::Vector2f a, sf::Vector2f p, sf::Vector2f b)
 {
 	if (magnitude(p - a) < magnitude(b - a))
+		return true;
+	else
+		return false;
+}
+
+bool isBetween(float a, float p, float b)
+{
+	if (p > a && p < b)
 		return true;
 	else
 		return false;

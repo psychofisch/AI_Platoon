@@ -16,6 +16,7 @@ Agent::Agent(const Agent & a)
 	m_path(a.m_path),
 	m_obstacles(a.m_obstacles),
 	m_otherAgents(a.m_otherAgents),
+	m_enemies(a.m_enemies),
 	m_wndw(a.m_wndw)
 {
 	i_init();
@@ -43,14 +44,15 @@ Agent::~Agent()
 
 void Agent::i_init()
 {
-	if(m_behaviour < 0 || m_behaviour > 3)
+	if(m_behaviour < 0 || m_behaviour > 4)
 	m_behaviour = STEER_FREE;
 
-	m_steering.resize(4);
+	m_steering.resize(5);
 	m_steering[STEER_FREE] = new Arrive();
 	m_steering[STEER_PATH] = new Seek();
 	m_steering[STEER_SEPARATION] = new Separation();
 	m_steering[STEER_COLLISION] = new ObstacleAvoid();
+	m_steering[STEER_ENEMIES] = new CollisionAvoid();
 
 	sf::Texture* player_tex = new sf::Texture();
 	player_tex->loadFromFile("player.png");
@@ -68,7 +70,7 @@ void Agent::i_init()
 
 	m_color = sf::Color(255, 255, 255);
 
-	m_otherAgents = nullptr;
+	//m_otherAgents = nullptr;
 }
 
 float Agent::getMaxSpeed() const
@@ -113,6 +115,11 @@ std::vector<gameobj>* Agent::getObstacles() const
 std::vector<Agent>* Agent::getOtherAgents() const
 {
 	return m_otherAgents;
+}
+
+std::vector<Agent>* Agent::getEnemies() const
+{
+	return m_enemies;
 }
 
 Path& Agent::getPath()
@@ -196,6 +203,11 @@ void Agent::setAgentPointer(std::vector<Agent>* agent_ptr)
 	m_otherAgents = agent_ptr;
 }
 
+void Agent::setEnemyPointer(std::vector<Agent>* enemy_ptr)
+{
+	m_enemies = enemy_ptr;
+}
+
 void Agent::setRenderWindow(sf::RenderWindow * rndwndw)
 {
 	m_wndw = rndwndw;
@@ -274,17 +286,16 @@ void Agent::drawPath(sf::RenderWindow * wndw)
 void Agent::update(float dt)
 {
 	//movement
-	Kinematics target = m_steering[m_behaviour]->getKinematics(*this);
-	Kinematics separation;
-	if(m_otherAgents != nullptr)
-		separation = m_steering[STEER_SEPARATION]->getKinematics(*this);
-	Kinematics collision = m_steering[STEER_COLLISION]->getKinematics(*this);
+	Kinematics doIt = m_steering[STEER_COLLISION]->getKinematics(*this);
 
-	Kinematics doIt = target;
-	if (collision.move == true)
-		doIt = collision;
-	else if (separation.move == true)
-		doIt = separation;
+	if(doIt.move != true)
+		doIt = m_steering[STEER_SEPARATION]->getKinematics(*this);
+
+	if (doIt.move != true)
+		doIt = m_steering[STEER_ENEMIES]->getKinematics(*this);
+
+	if (doIt.move != true)
+		doIt = m_steering[m_behaviour]->getKinematics(*this);
 
 	if (m_behaviour == STEER_PATH)
 		m_target = m_path.getNextWaypoint();
@@ -319,7 +330,7 @@ int Formation::addAgents(Agent& a)
 	a.setSteering(Agent::STEER_FREE);
 	m_agents.push_back(a);
 
-	m_agents[m_agents.size() - 1].setAgentPointer(&m_agents);
+	//m_agents[m_agents.size() - 1].setAgentPointer(&m_agents);
 
 	return m_agents.size();
 }
@@ -330,6 +341,11 @@ void Formation::update(float dt)
 
 	if (target.move == true)
 	{
+		if (m_behaviour == STEER_PATH)
+			m_target = m_path.getNextWaypoint();
+
+		m_velocity += target.linearAcc;
+
 		sf::Vector2f brake;
 		for (auto&& a : m_agents)
 		{
@@ -338,13 +354,12 @@ void Formation::update(float dt)
 				brake = tmp;
 		}
 
-		if (magnitude(brake) > 300.0f)
+		float brake_f = 300.f;
+		if (magnitude(brake) > brake_f)
 		{
-			float brake_val = (magnitude(brake) - 300.f) / 300.f * 600.f;
-			m_velocity += (target.linearAcc * brake_val);
+			float brake_val = std::min((magnitude(brake) - brake_f) / brake_f, 1.0f);
+			m_velocity = (m_velocity * (1.f - brake_val));
 		}
-		else
-			m_velocity += target.linearAcc;
 
 		if (magnitude(m_velocity) > m_maxSpeed)
 			m_velocity = normalize(m_velocity) * m_maxSpeed;
@@ -360,6 +375,9 @@ void Formation::update(float dt)
 			case 1: wedge = normalize(m_velocity) * 100.f + sf::Vector2f(normalize(m_velocity).y, -normalize(m_velocity).x) * 100.0f;
 				break;
 			case 2: wedge = normalize(m_velocity) * 100.f + sf::Vector2f(normalize(m_velocity).y, -normalize(m_velocity).x) * -100.0f;
+				break;
+			case 3: wedge = normalize(m_velocity) * 200.f + sf::Vector2f(normalize(m_velocity).y, 0.f) * 0.0f;
+				break;
 			}
 
 			m_agents[i].moveTo(getPosition() - wedge);

@@ -54,3 +54,12 @@ public:
 	// Inherited via Steering
 	virtual Kinematics getKinematics(Agent & agent) override;
 };
+
+class CollisionAvoid : public Steering {
+public:
+	CollisionAvoid();
+	~CollisionAvoid();
+
+	// Inherited via Steering
+	virtual Kinematics getKinematics(Agent & agent) override;
+};

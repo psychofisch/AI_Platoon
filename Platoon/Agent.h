@@ -15,7 +15,7 @@ class Agent : public gameobj
 	};
 
 public:
-	enum SteerMode { STEER_FREE = 0, STEER_PATH = 1, STEER_SEPARATION = 2, STEER_COLLISION = 3 };
+	enum SteerMode { STEER_FREE = 0, STEER_PATH = 1, STEER_SEPARATION = 2, STEER_COLLISION = 3, STEER_ENEMIES = 4 };
 
 	Agent();
 	Agent(const Agent& a);
@@ -28,6 +28,7 @@ public:
 	void getWhiskers(sf::Vector2f* out) const; //out is a 3 vector array (left, center, right)
 	std::vector<gameobj>* getObstacles() const;
 	std::vector<Agent>* getOtherAgents() const;
+	std::vector<Agent>* getEnemies() const;
 	Path& getPath();
 
 	void moveTo(sf::Vector2f target);
@@ -40,6 +41,7 @@ public:
 	int addWaypoint(sf::Vector2f p);
 	void setObstaclePointer(std::vector<gameobj>* obstacle_ptr);
 	void setAgentPointer(std::vector<Agent>* agent_ptr);
+	void setEnemyPointer(std::vector<Agent>* enemy_ptr);
 	void setRenderWindow(sf::RenderWindow* rndwndw);
 	void clearPath();
 
@@ -64,6 +66,7 @@ private:
 	Path m_path;
 	std::vector<gameobj>* m_obstacles;
 	std::vector<Agent>* m_otherAgents;
+	std::vector<Agent>* m_enemies;
 
 	//DEBUG
 	sf::RenderWindow* m_wndw;

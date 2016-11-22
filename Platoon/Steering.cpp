@@ -213,6 +213,8 @@ Kinematics Separation::getKinematics(Agent & agent)
 {
 	Kinematics result;
 	std::vector<Agent>* others = agent.getOtherAgents();
+	if (others == nullptr)
+		return result;
 
 	for (auto&& a : *others)
 	{
@@ -232,5 +234,60 @@ Kinematics Separation::getKinematics(Agent & agent)
 	if (magnitude(result.linearAcc) > 1.0f)
 		result.linearAcc = normalize(result.linearAcc);
 	result.linearAcc *= agent.getMaxAcc();
+	return result;
+}
+
+CollisionAvoid::CollisionAvoid()
+{
+}
+
+CollisionAvoid::~CollisionAvoid()
+{
+}
+
+Kinematics CollisionAvoid::getKinematics(Agent & agent)
+{
+	Kinematics result;
+	std::vector<Agent>* enemies = agent.getEnemies();
+
+	if (enemies == nullptr)
+		return result;
+
+	sf::Vector2f enemy_pos(INFINITY, INFINITY);
+	bool found = false;
+	for (auto&& e : *enemies)
+	{
+		sf::Vector2f tmp = agent.getPosition() - e.getPosition();
+		if (magnitude(tmp) > 400.f || magnitude(tmp) > magnitude(enemy_pos))
+			continue;
+		float angle = angleD(normalize(tmp)) - angleD(normalize(agent.getVelocity()));
+
+		std::cout << fabsf(angle) << std::endl;
+
+		if (isBetween(150.f, fabsf(angle), 210.f))
+		{
+			enemy_pos = tmp;
+			found = true;
+		}
+	}
+
+	if (!found)
+		return result;
+
+	float d = magnitude(enemy_pos);
+
+	//movement
+	result.linearAcc = -((normalize(enemy_pos) * agent.getMaxSpeed()) - agent.getVelocity());
+
+	if (magnitude(result.linearAcc) > agent.getMaxAcc())
+		result.linearAcc = (result.linearAcc / magnitude(result.linearAcc))*agent.getMaxAcc();
+	result.linearAcc *= -1.f;
+
+	//rotation
+	float targetRot = angleD(enemy_pos) - (agent.getRotation() - 180.f);
+	result.angular = rotate(targetRot);
+
+	//return
+	result.move = true;
 	return result;
 }
