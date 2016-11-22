@@ -41,8 +41,10 @@ public:
 	void setObstaclePointer(std::vector<gameobj>* obstacle_ptr);
 	void setAgentPointer(std::vector<Agent>* agent_ptr);
 	void setRenderWindow(sf::RenderWindow* rndwndw);
+	void clearPath();
 
 	void drawDebug(sf::RenderWindow* wndw);
+	void drawPath(sf::RenderWindow* wndw);
 	virtual void update(float dt);
 
 #ifndef _DEBUG

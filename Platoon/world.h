@@ -36,6 +36,7 @@ private:
 	std::vector<gameobj*> m_scene;
 	std::vector<gameobj> m_gameobjects;
 	Formation m_squad;
+	std::vector<Agent> m_enemies;
 	std::vector<sf::Texture*> m_textures;
 };
 

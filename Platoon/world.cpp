@@ -34,13 +34,11 @@ void world::run()
 	float dt = 0.0f;
 
 	//init squad
-	Formation formation;
-	formation.setPosition(sf::Vector2f(50.0f, 50.0f));
-	formation.moveTo(sf::Vector2f(50.0f, 50.0f));
-	formation.setMaxSpeed(100.0f);
-	formation.setMaxAcc(10.0f);
+	m_squad.setPosition(sf::Vector2f(50.0f, 50.0f));
+	m_squad.moveTo(sf::Vector2f(50.0f, 50.0f));
+	m_squad.setMaxSpeed(100.0f);
+	m_squad.setMaxAcc(10.0f);
 
-	//m_squad.push_back(Agent());
 	Agent tester;
 	m_textures.push_back(new sf::Texture());
 	m_textures[m_textures.size() - 1]->loadFromFile("player.png");
@@ -59,6 +57,21 @@ void world::run()
 	tester.setPosition(sf::Vector2f(200.f, 200.f));
 	tester.moveTo(sf::Vector2f(200.f, 200.f));
 	m_squad.addAgents(tester);
+	tester.setPosition(sf::Vector2f(100.f, 200.f));
+	m_squad.addAgents(tester);
+
+	//Enemies
+	Agent enemy(tester);
+	enemy.setColor(sf::Color(255, 229, 42, 255));
+	enemy.setPosition(sf::Vector2f(1040.f, 50.0f));
+	enemy.addWaypoint(sf::Vector2f(1040.f, 50.0f));
+	enemy.addWaypoint(sf::Vector2f(1041.f, 50.0f));
+	enemy.addWaypoint(sf::Vector2f(1042.f, 50.0f));
+	enemy.addWaypoint(sf::Vector2f(1040.f, 500.0f));
+	enemy.addWaypoint(sf::Vector2f(1041.f, 500.0f));
+	enemy.addWaypoint(sf::Vector2f(1042.f, 500.0f));
+
+	m_enemies.push_back(enemy);
 
 	bool quit = false;
 	while (!quit)
@@ -81,7 +94,7 @@ void world::run()
 			{
 				//for(auto&& a : m_squad)
 				//	a.moveTo(mousePos_mapped);
-				formation.setPosition(mousePos_mapped);
+				m_squad.moveTo(mousePos_mapped);
 				std::cout << mousePos_mapped.x << "," << mousePos_mapped.y << std::endl;
 				break;
 			}
@@ -89,7 +102,7 @@ void world::run()
 			{
 				//for (auto&& a : m_squad)
 				//	a.addWaypoint(mousePos_mapped);
-				formation.addWaypoint(mousePos_mapped);
+				m_squad.addWaypoint(mousePos_mapped);
 				std::cout << mousePos_mapped.x << "," << mousePos_mapped.y << std::endl;
 				break;
 			}
@@ -112,7 +125,7 @@ void world::run()
 				{
 				case sf::Keyboard::H:
 					//std::cout << m_squad[0].getPosition().x << ":" << m_squad[0].getPosition().y << std::endl;
-					std::cout << formation.getPosition().x << ":" << formation.getPosition().y << std::endl;
+					std::cout << m_squad.getPosition().x << ":" << m_squad.getPosition().y << std::endl;
 					break;
 				case sf::Keyboard::R:
 					break;
@@ -153,9 +166,16 @@ void world::run()
 			m_window->draw(obstacle.sprite);
 		}
 
-		formation.update(dt);
+		for (auto&& e : m_enemies)
+		{
+			e.update(dt);
+			m_window->draw(e.sprite);
+		}
+
+		m_squad.update(dt);
+		m_squad.drawPath(m_window);
 		//for (auto&& agent : m_squad)
-		for (auto&& agent : formation.getAgents())
+		for (auto&& agent : m_squad.getAgents())
 		{
 			//agent.update(dt);
 			m_window->draw(agent.sprite);

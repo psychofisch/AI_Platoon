@@ -43,6 +43,7 @@ Agent::~Agent()
 
 void Agent::i_init()
 {
+	if(m_behaviour < 0 || m_behaviour > 3)
 	m_behaviour = STEER_FREE;
 
 	m_steering.resize(4);
@@ -66,6 +67,8 @@ void Agent::i_init()
 	m_steps.curtime = 0.0f;
 
 	m_color = sf::Color(255, 255, 255);
+
+	m_otherAgents = nullptr;
 }
 
 float Agent::getMaxSpeed() const
@@ -198,6 +201,12 @@ void Agent::setRenderWindow(sf::RenderWindow * rndwndw)
 	m_wndw = rndwndw;
 }
 
+void Agent::clearPath()
+{
+	m_path = Path();
+	m_behaviour = STEER_FREE;
+}
+
 void Agent::drawDebug(sf::RenderWindow * wndw)
 {
 	//draw steps
@@ -209,19 +218,7 @@ void Agent::drawDebug(sf::RenderWindow * wndw)
 	}
 
 	//draw path&target
-	if (m_behaviour == STEER_PATH)
-	{
-		for (int i = 1; i <= m_path.size(); ++i)
-		{
-			//lines
-			sf::Vector2f line(m_path.getWaypoint(i - 1) - m_path.getWaypoint(i));
-			sf::RectangleShape lineShape(sf::Vector2f(magnitude(line), 5));
-			lineShape.setFillColor(sf::Color::Black);
-			lineShape.rotate(angleD(line));
-			lineShape.setPosition(m_path.getWaypoint(i));
-			wndw->draw(lineShape);
-		}
-	}
+	drawPath(wndw);
 
 	m_stepsSprite.setPosition(m_target);
 	m_stepsSprite.setColor(sf::Color::Red);
@@ -257,11 +254,30 @@ void Agent::drawDebug(sf::RenderWindow * wndw)
 	m_stepsSprite.setColor(sf::Color::White);
 }
 
+void Agent::drawPath(sf::RenderWindow * wndw)
+{
+	if (m_behaviour == STEER_PATH)
+	{
+		for (int i = 1; i <= m_path.size(); ++i)
+		{
+			//lines
+			sf::Vector2f line(m_path.getWaypoint(i - 1) - m_path.getWaypoint(i));
+			sf::RectangleShape lineShape(sf::Vector2f(magnitude(line), 5));
+			lineShape.setFillColor(sf::Color::Black);
+			lineShape.rotate(angleD(line));
+			lineShape.setPosition(m_path.getWaypoint(i));
+			wndw->draw(lineShape);
+		}
+	}
+}
+
 void Agent::update(float dt)
 {
 	//movement
 	Kinematics target = m_steering[m_behaviour]->getKinematics(*this);
-	Kinematics separation = m_steering[STEER_SEPARATION]->getKinematics(*this);
+	Kinematics separation;
+	if(m_otherAgents != nullptr)
+		separation = m_steering[STEER_SEPARATION]->getKinematics(*this);
 	Kinematics collision = m_steering[STEER_COLLISION]->getKinematics(*this);
 
 	Kinematics doIt = target;
@@ -302,6 +318,9 @@ int Formation::addAgents(Agent& a)
 {
 	a.setSteering(Agent::STEER_FREE);
 	m_agents.push_back(a);
+
+	m_agents[m_agents.size() - 1].setAgentPointer(&m_agents);
+
 	return m_agents.size();
 }
 
@@ -311,7 +330,21 @@ void Formation::update(float dt)
 
 	if (target.move == true)
 	{
-		m_velocity += target.linearAcc;
+		sf::Vector2f brake;
+		for (auto&& a : m_agents)
+		{
+			sf::Vector2f tmp = (getPosition() - a.getPosition());
+			if (magnitude(tmp) > magnitude(brake))
+				brake = tmp;
+		}
+
+		if (magnitude(brake) > 300.0f)
+		{
+			float brake_val = (magnitude(brake) - 300.f) / 300.f * 600.f;
+			m_velocity += (target.linearAcc * brake_val);
+		}
+		else
+			m_velocity += target.linearAcc;
 
 		if (magnitude(m_velocity) > m_maxSpeed)
 			m_velocity = normalize(m_velocity) * m_maxSpeed;
@@ -321,13 +354,15 @@ void Formation::update(float dt)
 
 		for (int i = 0; i < m_agents.size(); ++i)
 		{
-			sf::Vector2f wedge = getPosition();
-			/*switch (i)
+			sf::Vector2f wedge;
+			switch (i)
 			{
-			case 1: wedge -= (normalize(m_velocity) - sf::Vector2f(100.f, 100.f));
-			}*/
+			case 1: wedge = normalize(m_velocity) * 100.f + sf::Vector2f(normalize(m_velocity).y, -normalize(m_velocity).x) * 100.0f;
+				break;
+			case 2: wedge = normalize(m_velocity) * 100.f + sf::Vector2f(normalize(m_velocity).y, -normalize(m_velocity).x) * -100.0f;
+			}
 
-			m_agents[i].moveTo(wedge);
+			m_agents[i].moveTo(getPosition() - wedge);
 			m_agents[i].update(dt);
 		}
 	}
