@@ -38,6 +38,7 @@ public:
 	void setSprite(const sf::Texture* tex);
 	//void setSprite(std::vector<sf::Texture*>& textures, const char * path);
 	void setColor(sf::Color color);
+	void setBehaviour(SteerMode mode);
 	int addWaypoint(sf::Vector2f p);
 	void setObstaclePointer(std::vector<gameobj>* obstacle_ptr);
 	void setAgentPointer(std::vector<Agent>* agent_ptr);

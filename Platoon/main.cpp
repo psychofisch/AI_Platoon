@@ -24,6 +24,7 @@ int main()
 
 	world platoon(&window);
 	platoon.loadLevel("level1.x");
+	platoon.loadFormationPath("path.x");
 	//*** init
 
 	platoon.run();

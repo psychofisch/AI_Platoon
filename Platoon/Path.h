@@ -17,6 +17,7 @@ public:
 	int getNextWayPointIndex() const;
 	int size();
 
+	std::vector<sf::Vector2f>& getPath();
 	int addWaypoint(sf::Vector2f p);
 	int findNextWaypoint(sf::Vector2f p);
 

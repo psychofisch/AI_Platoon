@@ -91,6 +91,36 @@ void world::run()
 	enemy.addWaypoint(sf::Vector2f(1342.f, 500.0f));
 	m_enemies.push_back(enemy);
 
+	enemy.clearPath();
+	enemy.setPosition(sf::Vector2f(1440.f, 900.0f));
+	enemy.addWaypoint(sf::Vector2f(1440.f, 900.0f));
+	enemy.addWaypoint(sf::Vector2f(1441.f, 900.0f));
+	enemy.addWaypoint(sf::Vector2f(1442.f, 900.0f));
+	enemy.addWaypoint(sf::Vector2f(1441.f, 1500.0f));
+	enemy.addWaypoint(sf::Vector2f(1442.f, 1500.0f));
+	enemy.addWaypoint(sf::Vector2f(1443.f, 1500.0f));
+	m_enemies.push_back(enemy);
+
+	enemy.clearPath();
+	enemy.setPosition(sf::Vector2f(1600.f, 1880.f));
+	enemy.addWaypoint(sf::Vector2f(1600.f, 1880.f));
+	enemy.addWaypoint(sf::Vector2f(1601.f, 1880.f));
+	enemy.addWaypoint(sf::Vector2f(1602.f, 1880.f));
+	enemy.addWaypoint(sf::Vector2f(1600.f, 2500.f));
+	enemy.addWaypoint(sf::Vector2f(1601.f, 2500.f));
+	enemy.addWaypoint(sf::Vector2f(1602.f, 2500.f));
+	m_enemies.push_back(enemy);
+
+	enemy.clearPath();
+	enemy.setPosition(sf::Vector2f(160.f, 1880.f));
+	enemy.addWaypoint(sf::Vector2f(160.f, 1880.f));
+	enemy.addWaypoint(sf::Vector2f(161.f, 1880.f));
+	enemy.addWaypoint(sf::Vector2f(162.f, 1880.f));
+	enemy.addWaypoint(sf::Vector2f(790.f, 2230.f));
+	enemy.addWaypoint(sf::Vector2f(791.f, 2230.f));
+	enemy.addWaypoint(sf::Vector2f(792.f, 2230.f));
+	m_enemies.push_back(enemy);
+
 	bool quit = false;
 	while (!quit)
 	{
@@ -247,4 +277,15 @@ bool world::loadLevel(const char * path)
 	}
 
 	return true;
+}
+
+bool world::loadFormationPath(const char * path)
+{
+	if (FileIO::LoadPath(path, m_squad.getPath().getPath()))
+	{
+		m_squad.setBehaviour(Agent::STEER_PATH);
+		return true;
+	}
+	else
+		return false;
 }

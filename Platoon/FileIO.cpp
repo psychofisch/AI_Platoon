@@ -83,6 +83,36 @@ sf::Vector2f FileIO::LoadLevel(const char* path, std::vector<gameobj>& obstacles
 	return size;
 }
 
+bool FileIO::LoadPath(const char * path, std::vector<sf::Vector2f>& waypoints)
+{
+	std::ifstream file;
+	file.open(path);
+	if (!file.is_open())
+	{
+		std::cout << "Failed to open file: " << path << std::endl;
+		return false;
+	}
+
+	do {
+		std::string tmp;
+		std::getline(file, tmp);
+
+		if (tmp.size() == 0)
+			break;
+
+		float x, y;
+		sscanf_s(tmp.c_str(), "%f,%f", &x, &y);
+
+		waypoints.push_back(sf::Vector2f(x, y));
+
+		//std::cout << "world size = " << size.x << ":" << size.y << std::endl;
+	} while (!file.eof());
+
+	file.close();
+
+	return true;
+}
+
 std::string FileIO::LoadText(const char* path)
 {
 	std::ifstream file(path);

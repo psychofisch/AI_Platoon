@@ -187,6 +187,11 @@ void Agent::setColor(sf::Color color)
 	sprite.setColor(m_color);
 }
 
+void Agent::setBehaviour(SteerMode mode)
+{
+	m_behaviour = mode;
+}
+
 int Agent::addWaypoint(sf::Vector2f p)
 {
 	m_behaviour = STEER_PATH;
@@ -376,7 +381,7 @@ void Formation::update(float dt)
 				break;
 			case 2: wedge = normalize(m_velocity) * 100.f + sf::Vector2f(normalize(m_velocity).y, -normalize(m_velocity).x) * -100.0f;
 				break;
-			case 3: wedge = normalize(m_velocity) * 200.f + sf::Vector2f(normalize(m_velocity).y, 0.f) * 0.0f;
+			case 3: wedge = normalize(m_velocity) * 200.f + sf::Vector2f(normalize(m_velocity).y, -normalize(m_velocity).x) * 200.0f;
 				break;
 			}
 

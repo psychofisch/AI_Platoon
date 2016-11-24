@@ -43,6 +43,11 @@ int Path::size()
 	return m_path.size();
 }
 
+std::vector<sf::Vector2f>& Path::getPath()
+{
+	return m_path;
+}
+
 int Path::addWaypoint(sf::Vector2f p)
 {
 	m_path.push_back(p);

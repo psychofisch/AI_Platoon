@@ -26,6 +26,7 @@ public:
 	int addTexture(const char* path);
 	int addObstacle(sf::Texture* texture, sf::Vector2f position);
 	bool loadLevel(const char* path);
+	bool loadFormationPath(const char* path);
 private:
 	sf::RenderWindow* m_window;
 	sf::Sprite m_worldSprite;
