@@ -67,6 +67,8 @@ void world::run()
 
 	//Enemies
 	Agent enemy(tester);
+	enemy.setMaxAcc(5.0f);
+	enemy.setMaxSpeed(50.0f);
 	enemy.setEnemyPointer(nullptr);
 	enemy.setAgentPointer(nullptr);
 	enemy.setColor(sf::Color(255, 229, 42, 255));
@@ -77,7 +79,16 @@ void world::run()
 	enemy.addWaypoint(sf::Vector2f(1040.f, 500.0f));
 	enemy.addWaypoint(sf::Vector2f(1041.f, 500.0f));
 	enemy.addWaypoint(sf::Vector2f(1042.f, 500.0f));
+	m_enemies.push_back(enemy);
 
+	enemy.clearPath();
+	enemy.setPosition(sf::Vector2f(1340.f, 50.0f));
+	enemy.addWaypoint(sf::Vector2f(1340.f, 50.0f));
+	enemy.addWaypoint(sf::Vector2f(1341.f, 50.0f));
+	enemy.addWaypoint(sf::Vector2f(1342.f, 50.0f));
+	enemy.addWaypoint(sf::Vector2f(1340.f, 500.0f));
+	enemy.addWaypoint(sf::Vector2f(1341.f, 500.0f));
+	enemy.addWaypoint(sf::Vector2f(1342.f, 500.0f));
 	m_enemies.push_back(enemy);
 
 	bool quit = false;

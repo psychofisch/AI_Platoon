@@ -49,9 +49,7 @@ public:
 	void drawPath(sf::RenderWindow* wndw);
 	virtual void update(float dt);
 
-#ifndef _DEBUG
-private:
-#endif
+protected:
 	void i_init();
 
 	float m_maxSpeed;

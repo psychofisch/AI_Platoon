@@ -161,7 +161,7 @@ sf::Vector2f ObstacleAvoid::i_collides(Agent& a, sf::Sprite& s, sf::Vector2f w)
 	sf::Vector2f realCorners[4];
 	getRealCorners(s, realCorners);
 
-	a.m_stepsSprite.setColor(sf::Color::Magenta);
+	//a.m_stepsSprite.setColor(sf::Color::Magenta);
 	sf::Vector2f intersection(100.f, 100.f);
 	int intersectionIndex = -1;
 	for (int i = 0; i < 4; ++i)
@@ -186,8 +186,8 @@ sf::Vector2f ObstacleAvoid::i_collides(Agent& a, sf::Sprite& s, sf::Vector2f w)
 	if (!growBox(s.getGlobalBounds(), 10.0f).contains(intersection) || magnitude(intersection - a.getPosition()) > magnitude(w))
 		return sf::Vector2f(0.f, 0.f);
 
-	a.m_stepsSprite.setPosition(intersection);
-	a.m_wndw->draw(a.m_stepsSprite);
+	//a.m_stepsSprite.setPosition(intersection);
+	//a.m_wndw->draw(a.m_stepsSprite);
 
 	sf::Vector2f normal1(realCorners[(intersectionIndex == 3) ? 0 : intersectionIndex + 1].y - realCorners[intersectionIndex].y, -(realCorners[(intersectionIndex == 3) ? 0 : intersectionIndex + 1].x - realCorners[intersectionIndex].x));
 	sf::Vector2f normal2(-normal1.x, -normal1.y);
@@ -195,8 +195,8 @@ sf::Vector2f ObstacleAvoid::i_collides(Agent& a, sf::Sprite& s, sf::Vector2f w)
 	//if (magnitude(intersection - agent.getPosition() - normal1) < magnitude(intersection - agent.getPosition() - normal2))
 	//	normal1 = normal2;
 
-	a.m_stepsSprite.setPosition(normal1);
-	a.m_wndw->draw(a.m_stepsSprite);
+	//a.m_stepsSprite.setPosition(normal1);
+	//a.m_wndw->draw(a.m_stepsSprite);
 
 	return normalize(normal1);
 }
@@ -261,10 +261,7 @@ Kinematics CollisionAvoid::getKinematics(Agent & agent)
 		if (magnitude(tmp) > 400.f || magnitude(tmp) > magnitude(enemy_pos))
 			continue;
 		float angle = angleD(normalize(tmp)) - angleD(normalize(agent.getVelocity()));
-
-		std::cout << fabsf(angle) << std::endl;
-
-		if (isBetween(150.f, fabsf(angle), 210.f))
+		if (isBetween(120.f, fabsf(angle), 220.f))
 		{
 			enemy_pos = tmp;
 			found = true;
@@ -277,11 +274,10 @@ Kinematics CollisionAvoid::getKinematics(Agent & agent)
 	float d = magnitude(enemy_pos);
 
 	//movement
-	result.linearAcc = -((normalize(enemy_pos) * agent.getMaxSpeed()) - agent.getVelocity());
+	result.linearAcc = (normalize(enemy_pos) * agent.getMaxAcc());
 
 	if (magnitude(result.linearAcc) > agent.getMaxAcc())
-		result.linearAcc = (result.linearAcc / magnitude(result.linearAcc))*agent.getMaxAcc();
-	result.linearAcc *= -1.f;
+		result.linearAcc = normalize(result.linearAcc)*agent.getMaxAcc();
 
 	//rotation
 	float targetRot = angleD(enemy_pos) - (agent.getRotation() - 180.f);
