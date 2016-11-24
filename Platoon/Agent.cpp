@@ -354,10 +354,9 @@ void Formation::update(float dt)
 		sf::Vector2f brake;
 		for (auto&& a : m_agents)
 		{
-			sf::Vector2f tmp = (getPosition() - a.getPosition());
-			if (magnitude(tmp) > magnitude(brake))
-				brake = tmp;
+			brake += (getPosition() - a.getPosition());
 		}
+		brake /= 4.0f;
 
 		float brake_f = 300.f;
 		if (magnitude(brake) > brake_f)
